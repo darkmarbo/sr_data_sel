@@ -5,13 +5,37 @@ import sys
 import string
 import shutil
 
+## 是否生成wav语音  耗时 
+flag_wav=0
+
 ### 去掉channel=3 其他012的chn 只要知道设备dvc和spk  就能唯一确定数据
 
 king="King-ASR-358"
 king_table="King-ASR-358/TABLE"
+king_data="King-ASR-358/DATA"
 king_out="King-ASR-358_out2"
 king_out_table="King-ASR-358_out2/TABLE"
-NUM_SEL=50 ### 每个channel 总数  
+king_out_data="King-ASR-358_out2/DATA"
+
+list_dvc_ori=('CHANNEL0', 'CHANNEL1', 'CHANNEL2'); 
+
+NUM_SEL=100 ### 每个channel 总数  
+
+trans_dvc={"SHURE WH30":"DEVICE01", "Sennheiser ME104":"DEVICE02", "AKG C400BL":"DEVICE03",               "DEVICE01":"SHURE WH30", "DEVICE02":"Sennheiser ME104", "DEVICE03":"AKG C400BL",               "CHANNEL0":"DEVICE01", "CHANNEL1":"DEVICE02", "CHANNEL2":"DEVICE03"}; 
+
+trans_ses={"Honda Accord":"SESSION01", "Toyota Corolla":"SESSION02",  "SESSION01":"Honda Accord", "SESSION02":"Honda Accord"};
+
+
+### 记录处理过程中  原始speaker 与 新SPEAKER的对应关系 
+### 记录了 ori2new 和  new2ori 两种情况  
+###  1234  --->   SPEAKER0001
+trans_spk={}
+
+## 记录最终的 spk 的所有信息: 
+## SPKID	DVCID       SESID	    NSC	    UTN	 SEX AGE ACC TOTDUR	MINDUR	MAXDUR	AVEDUR
+## SPEAKER0001	    DEVICE01    SESSION02	noisy	220
+map_spk_final={};
+
 
 """
     ABBBBCDDD.wav
@@ -129,7 +153,7 @@ def count_rate_1(map_tab, key):
 ##
 ##    key1 表示第1个key 所在的列  = 2  SCD 
 ##    key2 表示第2个key 所在的列  = 3  CHN 
-def loat_table_2(dir_file, map_tab, key1, key2):
+def load_table_2(dir_file, map_tab, key1, key2):
     vec_row = [];
     num_row = 0;
     flag_1 = 0;
@@ -402,17 +426,18 @@ def select_spk_chn(map_spk, map_ses):
         ## DATA/CHANNEL1/SCRIPT/100100.TXT
         for spk in vec_spk_chn:
 
-            #### 1. wave 
-            #### DATA/CHANNEL0/WAVE/SPEAKER0830 里面是 SESSION0
-            #dir_wav="%s/DATA/CHANNEL%s/WAVE/SPEAKER%s"%(king, CHN,spk)
-            #print("test:path_dir_wav=%s"%(dir_wav));
-            #if not os.path.isdir(dir_wav):
-            #    print("error:path=%s not exist!"%(dir_wav));
-            #    sys.exit(0);
-            #dir_wav_out="%s/DATA/CHANNEL%s/WAVE"%(king_out, CHN)
-            #if not os.path.isdir(dir_wav_out):
-            #    os.makedirs(dir_wav_out);
-            #shutil.copytree(dir_wav, "%s/SPEAKER%s"%(dir_wav_out,spk));
+            if flag_wav == 1:
+                #### 1. wave 
+                #### DATA/CHANNEL0/WAVE/SPEAKER0830 里面是 SESSION0
+                dir_wav="%s/DATA/CHANNEL%s/WAVE/SPEAKER%s"%(king, CHN,spk)
+                print("test:path_dir_wav=%s"%(dir_wav));
+                if not os.path.isdir(dir_wav):
+                    print("error:path=%s not exist!"%(dir_wav));
+                    sys.exit(0);
+                dir_wav_out="%s/DATA/CHANNEL%s/WAVE"%(king_out, CHN)
+                if not os.path.isdir(dir_wav_out):
+                    os.makedirs(dir_wav_out);
+                shutil.copytree(dir_wav, "%s/SPEAKER%s"%(dir_wav_out,spk));
 
             #### 2. script   ABBBBC.TXT
             ### DATA/CHANNEL1/SCRIPT/100100.TXT
@@ -427,7 +452,7 @@ def select_spk_chn(map_spk, map_ses):
                 os.makedirs(dir_scp_out);
             shutil.copy(file_scp, file_scp_out);
 
-        ## 3. SESSION.txt
+        ## 3. SESSION.TXT
         #DVCID		SPKID		SESID		NSC		UTN	TOTDUR	MINDUR	MAXDUR	AVEDUR
         #DEVICE01	SPEAKER0001	SESSION01	quiet	100	xx		xx		xx		xx
         for spk in vec_spk_chn:
@@ -439,10 +464,10 @@ def select_spk_chn(map_spk, map_ses):
             vec_write_ses.append(map_ses[spk][CHN]['UTN']);
             write_session('SESSION', vec_write_ses);
 
-        ## 4. SAMPSTAT.txt
+        ## 4. SAMPSTAT.TXT
         ## 新格式 
         #SPKID		SESID		UTTID				SAMPRATE	BITS	DUR		SNR	
-        #SPEAKER0001	SESSION01	01_0001_01_0001.wav	44100		16		2.570	55.939
+        #SPEAKER0001	SESSION01	01_0001_01_0001	44100		16		2.570	55.939
 
         ## 原始格式 :
         ## SPKRID	SESID	UTTID	SAMPRATE	BITS	DUR	SNR	CLP	MAXAMP	MEANAMP
@@ -542,7 +567,33 @@ def write_session(flag, vec_in):
         fp.write("\n");
         fp.close()
 
+## 转换 010600016  ---->  AA_BBBB_CC_DDDD
+def trans_wav(name):
 
+    chn=int(name[0]);
+    spk=trans_spk[name[1:5]][-4:];
+
+    ##ses=int(name[5]);
+    ses=int(map_spk_final[trans_spk[name[1:5]]]['SESID'][-2:]);
+    wav=int(name[6:])
+
+    name_new="%02d_%s_%02d_%04d"%(chn,spk, ses, wav);
+
+    return name_new;
+
+
+## 转换 0 1060 0  ---->  AA_BBBB_CC
+def trans_scp(name):
+
+    chn=int(name[0]);
+    spk=trans_spk[name[1:5]][-4:];
+
+    ##ses=int(name[5]);
+    ses=int(map_spk_final[trans_spk[name[1:5]]]['SESID'][-2:]);
+
+    name_new="%02d_%s_%02d"%(chn,spk, ses);
+
+    return name_new;
 
 
 """
@@ -563,10 +614,6 @@ def write_session(flag, vec_in):
 def format_table():
     ### DATA/DEVICE01/WAVE/SPEAKER0001/SESSION01
 
-    trans_dvc={"SHURE WH30":"DEVICE01", "Sennheiser ME104":"DEVICE02", "AKG C400BL":"DEVICE03"}; 
-    trans_ses={"Honda Accord":"SESSION01", "Toyota Corolla":"SESSION02"};
-    ### 记录处理过程中  原始speaker 与 新SPEAKER的对应关系 
-    trans_spk={}
 
 
     ## SESSION.txt:
@@ -600,7 +647,14 @@ def format_table():
         num_spk += 1;
         spk_new = "SPEAKER%04d"%(num_spk);
 
+        ### 记录所有spk的信息  
+        ## SPKID    DVCID  SESID	    NSC	    UTN	    TOTDUR	MINDUR	MAXDUR	AVEDUR
+        map_spk_final[spk_new]={};
+        map_spk_final[spk_new]['DVCID']=dvc;
+        map_spk_final[spk_new]['SESID']=ses;
+
         trans_spk[spk_ori] = spk_new;
+        trans_spk[spk_new] = spk_ori;
         print("%s\t%s\t%s"%(vec_line[0],spk_ori, spk_new));
 
         fp_ses_out.write("%s\t%s\t%s"%(dvc, spk_new, ses));
@@ -611,6 +665,10 @@ def format_table():
 
     fp_ses.close();
     fp_ses_out.close();
+
+    ### 重新读取新的SESSION.txt 文件  得到map_spk_final 
+    ##load_table_1("%s/SESSION.txt"%(king_out_table), map_spk_final, 2);
+    
 
     ## SPEAKER.txt:
     ## SPKID	SEX	AGE	ACC
@@ -649,9 +707,132 @@ def format_table():
     ## 1660	Toyota Corolla	016600150	16000	    16	    1.994	28.898
     ## 结果:
     ## SPKID		SESID		UTTID				SAMPRATE	BITS	DUR		SNR	
-    ## SPEAKER0001	SESSION01	01_0001_01_0001.wav	44100		16		2.570	55.939
+    ## SPEAKER0001	SESSION01	01_0001_01_0001	44100		16		2.570	55.939
+    fp_smp=open("%s/SAMPSTAT.TXT"%(king_out_table));
+    fp_smp_out=open("%s/SAMPSTAT.txt"%(king_out_table), "w");
+    flag=0;
+    for line in fp_smp:
+
+        line=line.strip();
+        vec_line=line.split("\t");
+
+        if flag == 0:
+           fp_smp_out.write("%s\n"%(line)); 
+           flag=1;
+           continue;
+        
+        ## 转换 speaker 
+        spk_new  = trans_spk[vec_line[0]];
+        fp_smp_out.write("%s"%(spk_new));
+        ## 转换 session 
+        ses_new  = trans_ses[vec_line[1]];
+        fp_smp_out.write("\t%s"%(ses_new));
+        ## 转换 UTTID  010600016: ABBBBCDDD.wav
+        wav_new=trans_wav(vec_line[2]);
+        fp_smp_out.write("\t%s"%(wav_new));
+
+        for value in vec_line[3:]:
+            fp_smp_out.write("\t%s"%(value));
+        fp_smp_out.write("\n");
+        
+
+    fp_smp.close();
+    fp_smp_out.close();
 
 
+    ### todo  使用 sample文件中的 dur信息 重写SESSION文件
+    ## SPKID   SESID   UTTID   SAMPRATE    BITS    DUR SNR
+    ## SPEAKER0051 SESSION01   00_0051_01_0016 16000   16  3.129   18.305
+    ## DVCID	SPKID	SESID	NSC	UTN	TOTDUR	MINDUR	MAXDUR	AVEDUR
+    ## DEVICE01	SPEAKER0001	SESSION02	noisy	220
+
+
+## 生成wav的最终格式  所有wav和目录重命名 
+## 原始: DATA/CHANNEL2/WAVE/SPEAKER3010/SESSION0/230100188.WAV
+## 新的: DATA/DEVICE02/WAVE/SPEAKER0001/SESSION2/02_0001_02_0188.wav
+def rename_data():
+    ## ['CHANNEL0', 'CHANNEL1', 'CHANNEL2'] 
+    for dvc_ori in list_dvc_ori:
+
+        dvc_new = trans_dvc[dvc_ori];
+
+        ## King-ASR-358_out2/DATA/DEVICE02
+        path_dvc_ori = "%s/%s"%(king_out_data, dvc_ori);
+        path_dvc_new = "%s/%s"%(king_out_data, dvc_new);
+
+
+        ## King-ASR-358_out2/DATA/DEVICE02/WAVE
+        ## 不同的 speaker 进入到不同的 session 中 
+        path_WAVE="%s/WAVE"%(path_dvc_ori)
+        list_spk=os.listdir(path_WAVE);
+        for spk_ori in list_spk:
+
+            path_spk_ori="%s/%s"%(path_WAVE, spk_ori)
+            spk_new = trans_spk[spk_ori[-4:]]
+            path_spk_new="%s/WAVE/%s"%(path_dvc_new, spk_new)
+
+            path_ses_ori="%s/SESSION0"%(path_spk_ori)
+            path_ses_new="%s/%s"%(path_spk_new, map_spk_final[spk_new]['SESID'])
+
+            #print("makedirs  %s"%(path_spk_new));
+            os.makedirs(path_ses_new);
+
+            list_wav = os.listdir(path_ses_ori);
+            for wav_ori in list_wav: 
+                ## 230100188.WAV
+                path_wav_ori = "%s/%s"%(path_ses_ori, wav_ori);
+                wav_new = "%s.WAV"%(trans_wav(wav_ori[0:9]))
+                path_wav_new = "%s/%s"%(path_ses_new, wav_new);
+                #print("mv  %s  --->  %s"%(path_wav_ori, path_wav_new));
+                shutil.move(path_wav_ori, path_wav_new);
+                ##os.rename(path_wav_ori, path_wav_new);
+
+    return 0;
+
+
+## 处理所有wav对应的script  
+## King-ASR-358_out2/DATA/CHANNEL1/SCRIPT/100500.TXT
+def create_script():
+    ## ['CHANNEL0', 'CHANNEL1', 'CHANNEL2'] 
+    for dvc_ori in list_dvc_ori:
+
+        dvc_new = trans_dvc[dvc_ori];
+
+        ## King-ASR-358_out2/DATA/DEVICE02/SCRIPT
+        path_scp_ori = "%s/%s/SCRIPT"%(king_out_data, dvc_ori);
+        path_scp_new = "%s/%s/SCRIPT"%(king_out_data, dvc_new);
+        os.makedirs(path_scp_new);
+        list_scp=os.listdir(path_scp_ori);
+        for scp_ori in list_scp:
+            scp_new = "%s.TXT"%(trans_scp(scp_ori[0:6]));
+
+            fp_in=open("%s/%s"%(path_scp_ori, scp_ori))
+            fp_out=open("%s/%s"%(path_scp_new, scp_new), "w")
+            ##100500001	拨打张瑜的133的电话
+            ##	拨打张瑜的幺三三的电话
+            num_line=0;
+            for line in fp_in:
+
+                num_line += 1;
+
+                line=line.strip();
+                if line == "":
+                    continue;
+
+                vec_line = line.split("\t");
+
+                if num_line%2 == 1:
+                    fp_out.write("%s\t"%(trans_wav(vec_line[0])));
+                else:
+                    fp_out.write("%s\n"%(vec_line[0]));
+
+            fp_in.close();
+            fp_out.close();
+
+        ## 删除其他无用数据 
+        ## King-ASR-358_out2/DATA/CHANNEL
+        dir_rm="%s/%s"%(king_out_data, dvc_ori)
+        shutil.rmtree(dir_rm);
 
 
 if __name__ == '__main__':
@@ -683,7 +864,7 @@ if __name__ == '__main__':
     #out_table_1(map_cnt);
 
     map_ses={}
-    loat_table_2("%s/SESSION.TXT"%(king_table), map_ses, 2, 3);
+    load_table_2("%s/SESSION.TXT"%(king_table), map_ses, 2, 3);
     #out_table_2(map_ses);
 
     #count_rate_2(map_ses, 'CHN')
@@ -711,7 +892,12 @@ if __name__ == '__main__':
     format_table();
 
 
+    ## 重新命名所有wav和相关目录 
+    if flag_wav == 1:
+        rename_data();
 
+    ## 创建script目录 和 重新命名所有script  
+    create_script();
 
     sys.exit(0);
 
