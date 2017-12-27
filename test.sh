@@ -3,7 +3,7 @@
 ### king_asr_429:
 dos2unix king_429_test/TABLE/*
 rm -rf king_429_test_ou*
-python2.7 rrr.py  > king_429_test.log 
+python2.7 rrr_429.py  > king_429_test.log 
 
 
 

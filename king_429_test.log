@@ -1,0 +1,85 @@
+
+
+statistic: SEX	num:
+F	153
+M	147
+
+
+statistic: AGE	num:
+18	13
+19	22
+20	21
+21	21
+22	16
+23	21
+24	29
+25	1
+26	2
+28	1
+29	2
+30	3
+31	16
+32	25
+33	13
+34	21
+35	17
+36	1
+37	1
+38	2
+39	1
+41	1
+42	1
+44	1
+46	19
+47	11
+48	6
+49	1
+50	1
+52	1
+54	1
+57	3
+59	2
+60	3
+
+
+statistic: ACC	num:
+China, Anhui,	7
+China, Beijing,	76
+China, Chongqing,	1
+China, Gansu,	4
+China, Guangdong,	7
+China, Guangxi,	2
+China, Guizhou,	2
+China, Hainan,	5
+China, Hebei,	51
+China, Heilongjiang,	11
+China, Heilongjinag,	4
+China, Henan,	22
+China, Hubei,	10
+China, Hunan,	8
+China, Inner Mongolia,	8
+China, Jiagsu,	1
+China, Jiangsu,	6
+China, Jiangxi,	6
+China, Jilin,	3
+China, Liaoning,	7
+China, Ningxia,	1
+China, Shaanxi,	5
+China, Shandong,	15
+China, Shanxi,	17
+China, Sichuan,	8
+China, Sinkiang,	4
+China, Tianjin,	5
+China, Zhejiang,	4
+
+
+statistic: DVC	num:
+HTC	65
+Huawei	23
+MIUI	63
+Samsung	149
+
+
+statistic: NSC	num:
+noisy	120
+quite	180
