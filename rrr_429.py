@@ -8,6 +8,8 @@ import shutil
 '''
     king_asr_429 数据库 
     300个SPEAKER   每个SPEAKER 包含116句
+    根据 DVC NSC SEX AGE ACC 均衡 选取总计 200人 
+
     DVC:
         statistic: DVC	num:
         HTC	65
@@ -38,7 +40,7 @@ king_out_data="%s/DATA"%(king_out)
 
 list_dvc_ori=('CHANNEL0', 'CHANNEL1', 'CHANNEL2'); 
 
-NUM_SEL=100 ### 每个channel 总数  
+NUM_SEL=200 ### 每个channel 总数  
 
 trans_dvc={"SHURE WH30":"DEVICE01", "Sennheiser ME104":"DEVICE02", "AKG C400BL":"DEVICE03",               "DEVICE01":"SHURE WH30", "DEVICE02":"Sennheiser ME104", "DEVICE03":"AKG C400BL",               "CHANNEL0":"DEVICE01", "CHANNEL1":"DEVICE02", "CHANNEL2":"DEVICE03"}; 
 
@@ -258,80 +260,28 @@ def count_rate_2(map_tab, key):
 ### 年龄段映射 
 def age2str(age):
     age=int(age)
-    if age>0 and age<=10:
-        return 1;
-    elif age>10 and age<=20:
-        return 2;
-    elif age>20 and age<=30:
-        return 3;
-    elif age>30 and age<=40:
-        return 4;
-    elif age>40 and age<=50:
-        return 5;
-    elif age>50 and age<=60:
-        return 6;
-    elif age>60:
-        return 7;
-    else:
-        return 0;
+    return 0;
+    #if age>0 and age<=10:
+    #    return 1;
+    #elif age>10 and age<=20:
+    #    return 2;
+    #elif age>20 and age<=30:
+    #    return 3;
+    #elif age>30 and age<=40:
+    #    return 4;
+    #elif age>40 and age<=50:
+    #    return 5;
+    #elif age>50 and age<=60:
+    #    return 6;
+    #elif age>60:
+    #    return 7;
+    #else:
+    #    return 0;
 
 ### 方言区 映射 
 def acc2str(acc):
     str="";
 
-
-#### 测试部分 选取出NUM_SEL个SPEAKER 
-###  使得 CHN DVC CAR SEX AGE 平均 
-def select_spk(map_spk, map_ses):
-    map_sel={}  ### 记录选取出来的SPEAKER 
-    num_sel=0
-
-
-    map_count={} ### map_count['0_SHURE WH30_Honda Accord_F_2'] = ['2310', '2820']
-    for k1 in map_ses.keys():
-        SPK=k1;
-        for k2 in map_ses[k1].keys():
-            CHN=k2
-            DVC = map_ses[k1][k2]['DVC']; ### map[0000][0][DVC] = "SHURE WH30"
-            CAR = map_ses[k1][k2]['CAR']; ### map[0000][0][DVC] = "SHURE WH30"
-            SEX=map_spk[SPK]['SEX']
-            AGE=map_spk[SPK]['AGE']
-            AGE=age2str(AGE);
-            ACC=map_spk[SPK]['ACC']
-
-            #key = "%s\t%s\t%s\t%s\t%s\t%s"%(CHN,DVC,CAR,SEX,AGE,ACC)
-            key = "%s\t%s\t%s\t%s\t%s"%(CHN,DVC,CAR,SEX,AGE)
-            if map_count.has_key(key):
-                map_count[key].append(SPK);
-            else:
-                map_count[key]=[];
-                map_count[key].append(SPK);
-
-    items = map_count.items();
-    items.sort()
-    print("=======  组合个数:");
-    for kk,vv in items:
-        print("%s\t%d:"%(kk,len(map_count[kk]))),
-        print(map_count[kk]);
-    
-    ### 选取说话人
-    while(num_sel< NUM_SEL):
-        for key in map_count.keys():  ### 每一个组合
-            vec_spk=map_count[key]; ###  每一个spk
-            for spk_tmp in vec_spk:
-                ### 每一个spk  检测其是否 存在于map_sel中 
-                if num_sel<NUM_SEL and (not map_sel.has_key(spk_tmp)):
-                    map_sel[spk_tmp] = 1;
-                    num_sel += 1;
-                    break;
-
-    vec_out_spk=[];
-    for key in map_sel:
-        vec_out_spk.append(key);
-        print(key);
-
-
-    return vec_out_spk;
 
 
 #### 获取map中某一列的所有元素的种类list
@@ -394,145 +344,145 @@ def count_rate_3(vec_in):
         print("%s\t%d\t%.2f"%(kk,map_count[kk], 100.0*map_count[kk]/num_all))
 
 
-### channel=012 不包括3 中每一类spk个数 必须等于NUM_SEL=50 
-### 同时保证其他所有参数尽量平均 
+### 根据 DVC NSC SEX AGE ACC 均衡 
+### 选取总计 200人 
 def select_spk_chn(map_spk, map_ses):
     map_sel={}  ### 记录选取出来的SPEAKER 
-    vec_chn=['0','1','2']
 
-    ### 每一个channel内部  保持参数均衡 
-    for CHN in vec_chn:
-        num_sel=0
-        ### map_count['SHURE WH30_Honda Accord_F_2'] = ['2310', '2820']
-        map_count={} 
-        ### map[0000][0][DVC] = "SHURE WH30"
-        ### 每个人  对应的channel=CHN 
-        for k1 in map_ses.keys():
-            SPK=k1;
-            DVC = map_ses[k1][CHN]['DVC']; 
-            CAR = map_ses[k1][CHN]['CAR']; ### map[0000][0][DVC] = "SHURE WH30"
-            SEX=map_spk[SPK]['SEX']
-            AGE=map_spk[SPK]['AGE']
-            AGE=age2str(AGE);
-            ACC=map_spk[SPK]['ACC']
+    ### map_count['DVC NSC SEX AGE ACC'] = ['2310', '2820']
+    map_count={} 
 
-            #key = "%s\t%s\t%s\t%s\t%s\t%s"%(CHN,DVC,CAR,SEX,AGE,ACC)
-            key = "%s\t%s\t%s\t%s"%(DVC,CAR,SEX,AGE)
-            if map_count.has_key(key):
-                map_count[key].append(SPK);
-            else:
-                map_count[key]=[];
-                map_count[key].append(SPK);
+    ### map[0000][0][DVC] = "SHURE WH30"
+    for SPK in map_ses.keys():
+        SEX=map_spk[SPK]['SEX']
+        AGE=map_spk[SPK]['AGE']
+        AGE=age2str(AGE);
+        ACC=map_spk[SPK]['ACC']
+
+        DVC=map_ses[SPK]['DVC']
+        NSC=map_ses[SPK]['NSC']
+
+        #key = "%s\t%s\t%s\t%s"%(DVC,NSC,SEX,AGE)
+        key = "%s\t%s\t%s\t%s"%(DVC,NSC,SEX,AGE)
+        if map_count.has_key(key):
+            map_count[key].append(SPK);
+        else:
+            map_count[key]=[];
+            map_count[key].append(SPK);
 
 
-        print("\n=======  组合个数: channel=%s"%(CHN));
-        items = map_count.items();
-        items.sort()
-        for kk,vv in items:
-            print("%s\t%d:"%(kk,len(map_count[kk]))),
-            print(map_count[kk]);
-        
-        print("\n 选取的说话人: ");
-        ### 选取说话人
-        vec_spk_chn=[];  ## 记录当前channel 的 50个spk 
-        while(num_sel< NUM_SEL):
-            for key in map_count.keys():  ### 每一个组合
-                vec_spk=map_count[key]; ###  每一个spk
-                for spk_tmp in vec_spk:
-                    ### 每一个spk  检测其是否 存在于map_sel中 
-                    if num_sel<NUM_SEL and (not map_sel.has_key(spk_tmp)):
-                        map_sel[spk_tmp] = 1;
-                        num_sel += 1;
-                        vec_spk_chn.append(spk_tmp);
-                        print(spk_tmp);
-                        break;
+    print("\n均衡信息记录:");
+    items = map_count.items();
+    items.sort()
+    for kk,vv in items:
+        print("%s\t%d:"%(kk,len(map_count[kk]))),
+        print(map_count[kk]);
+    
 
-        #### 统计当前chn 对应的 50个spk 的某个分类的比例  
-        count_rate_3( get_row_2(map_ses, vec_spk_chn, CHN, 'DVC') );
-        count_rate_3( get_row_2(map_ses, vec_spk_chn, CHN, 'CAR') );
+    print("\n 最终选取的说话人: ");
+    vec_spk_chn=[];  
+    num_sel=0
+    while(num_sel < NUM_SEL):
+        for key in map_count.keys():  ### 每一个组合
+            vec_spk=map_count[key]; ###  当前组合中的所有spk
+            for spk_tmp in vec_spk:
+                ### 每一个spk  检测其是否 存在于map_sel中 
+                if num_sel<NUM_SEL and (not map_sel.has_key(spk_tmp)):
+                    map_sel[spk_tmp] = 1;
+                    num_sel += 1;
+                    vec_spk_chn.append(spk_tmp);
+                    print(spk_tmp);
+                    break;
 
-        ### 拷贝相应的wav和script 到指定目录 
-        ## DATA/CHANNEL1/WAVE/SPEAKER0010/SESSION0/100100001.WAV
-        ## DATA/CHANNEL1/SCRIPT/100100.TXT
-        for spk in vec_spk_chn:
+    #### 统计当前chn 对应的 50个spk 的某个分类的比例  
+    count_rate_3( get_row_1(map_spk, vec_spk_chn, 'SEX') );
+    count_rate_3( get_row_1(map_spk, vec_spk_chn, 'AGE') );
+    count_rate_3( get_row_1(map_spk, vec_spk_chn, 'ACC') );
+    count_rate_3( get_row_1(map_ses, vec_spk_chn, 'DVC') );
+    count_rate_3( get_row_1(map_ses, vec_spk_chn, 'NSC') );
 
-            if flag_wav == 1:
-                #### 1. wave 
-                #### DATA/CHANNEL0/WAVE/SPEAKER0830 里面是 SESSION0
-                dir_wav="%s/DATA/CHANNEL%s/WAVE/SPEAKER%s"%(king, CHN,spk)
-                print("test:path_dir_wav=%s"%(dir_wav));
-                if not os.path.isdir(dir_wav):
-                    print("error:path=%s not exist!"%(dir_wav));
-                    sys.exit(0);
-                dir_wav_out="%s/DATA/CHANNEL%s/WAVE"%(king_out, CHN)
-                if not os.path.isdir(dir_wav_out):
-                    os.makedirs(dir_wav_out);
-                shutil.copytree(dir_wav, "%s/SPEAKER%s"%(dir_wav_out,spk));
+    #### 拷贝相应的wav和script 到指定目录 
+    ### DATA/CHANNEL1/WAVE/SPEAKER0010/SESSION0/100100001.WAV
+    ### DATA/CHANNEL1/SCRIPT/100100.TXT
+    #for spk in vec_spk_chn:
 
-            #### 2. script   ABBBBC.TXT
-            ### DATA/CHANNEL1/SCRIPT/100100.TXT
-            file_name="%s%s0"%(CHN,spk)
-            file_scp="%s/DATA/CHANNEL%s/SCRIPT/%s.TXT"%(king, CHN,file_name)
-            if not os.path.isfile(file_scp):
-                print("errror:file=%s not exist!"%(file_scp));
-                sys.exit(0);
-            dir_scp_out="%s/DATA/CHANNEL%s/SCRIPT"%(king_out, CHN)
-            file_scp_out="%s/%s.TXT"%(dir_scp_out, file_name)
-            if not os.path.isdir(dir_scp_out):
-                os.makedirs(dir_scp_out);
-            shutil.copy(file_scp, file_scp_out);
+    #    if flag_wav == 1:
+    #        #### 1. wave 
+    #        #### DATA/CHANNEL0/WAVE/SPEAKER0830 里面是 SESSION0
+    #        dir_wav="%s/DATA/CHANNEL%s/WAVE/SPEAKER%s"%(king, CHN,spk)
+    #        print("test:path_dir_wav=%s"%(dir_wav));
+    #        if not os.path.isdir(dir_wav):
+    #            print("error:path=%s not exist!"%(dir_wav));
+    #            sys.exit(0);
+    #        dir_wav_out="%s/DATA/CHANNEL%s/WAVE"%(king_out, CHN)
+    #        if not os.path.isdir(dir_wav_out):
+    #            os.makedirs(dir_wav_out);
+    #        shutil.copytree(dir_wav, "%s/SPEAKER%s"%(dir_wav_out,spk));
 
-        ## 3. SESSION.TXT
-        #DVCID		SPKID		SESID		NSC		UTN	TOTDUR	MINDUR	MAXDUR	AVEDUR
-        #DEVICE01	SPEAKER0001	SESSION01	quiet	100	xx		xx		xx		xx
-        for spk in vec_spk_chn:
-            vec_write_ses=[];
-            vec_write_ses.append(map_ses[spk][CHN]['DVC']);
-            vec_write_ses.append(map_ses[spk][CHN]['SCD']);
-            vec_write_ses.append(map_ses[spk][CHN]['CAR']);
-            vec_write_ses.append('noisy');
-            vec_write_ses.append(map_ses[spk][CHN]['UTN']);
-            write_session('SESSION', vec_write_ses);
+    #    #### 2. script   ABBBBC.TXT
+    #    ### DATA/CHANNEL1/SCRIPT/100100.TXT
+    #    file_name="%s%s0"%(CHN,spk)
+    #    file_scp="%s/DATA/CHANNEL%s/SCRIPT/%s.TXT"%(king, CHN,file_name)
+    #    if not os.path.isfile(file_scp):
+    #        print("errror:file=%s not exist!"%(file_scp));
+    #        sys.exit(0);
+    #    dir_scp_out="%s/DATA/CHANNEL%s/SCRIPT"%(king_out, CHN)
+    #    file_scp_out="%s/%s.TXT"%(dir_scp_out, file_name)
+    #    if not os.path.isdir(dir_scp_out):
+    #        os.makedirs(dir_scp_out);
+    #    shutil.copy(file_scp, file_scp_out);
 
-        ## 4. SAMPSTAT.TXT
-        ## 新格式 
-        #SPKID		SESID		UTTID				SAMPRATE	BITS	DUR		SNR	
-        #SPEAKER0001	SESSION01	01_0001_01_0001	44100		16		2.570	55.939
+    ### 3. SESSION.TXT
+    ##DVCID		SPKID		SESID		NSC		UTN	TOTDUR	MINDUR	MAXDUR	AVEDUR
+    ##DEVICE01	SPEAKER0001	SESSION01	quiet	100	xx		xx		xx		xx
+    #for spk in vec_spk_chn:
+    #    vec_write_ses=[];
+    #    vec_write_ses.append(map_ses[spk][CHN]['DVC']);
+    #    vec_write_ses.append(map_ses[spk][CHN]['SCD']);
+    #    vec_write_ses.append(map_ses[spk][CHN]['CAR']);
+    #    vec_write_ses.append('noisy');
+    #    vec_write_ses.append(map_ses[spk][CHN]['UTN']);
+    #    write_session('SESSION', vec_write_ses);
 
-        ## 原始格式 :
-        ## SPKRID	SESID	UTTID	SAMPRATE	BITS	DUR	SNR	CLP	MAXAMP	MEANAMP
-        ## 0000	0	000000001	16000	16	3.475	22.165	0.000	-11.070824149477	0
-        ## 第3列wav的id 是map的key 通过它来查找...
-        for utt in map_smp.keys():
-            ## 300000001  ABBBBCDDD
-            utt_chn=utt[0]
-            utt_spk=utt[1:5]
-            utt_ses=utt[5]
-            utt_wav=utt[6:]
-            ##print("test:%s\t%s\t%s\t%s\t%s"%(utt, utt_chn, utt_spk, utt_ses, utt_wav));
-            if utt_chn == CHN and utt_spk in vec_spk_chn:
-                vec_write_ses=[];
-                vec_write_ses.append(utt_spk);
-                vec_write_ses.append(map_ses[utt_spk][CHN]['CAR']);
-                vec_write_ses.append(utt);
-                vec_write_ses.append(map_smp[utt]['SAMPRATE']);
-                vec_write_ses.append(map_smp[utt]['BITS']);
-                vec_write_ses.append(map_smp[utt]['DUR']);
-                vec_write_ses.append(map_smp[utt]['SNR']);
-                write_session('SAMPSTAT', vec_write_ses);
+    ### 4. SAMPSTAT.TXT
+    ### 新格式 
+    ##SPKID		SESID		UTTID				SAMPRATE	BITS	DUR		SNR	
+    ##SPEAKER0001	SESSION01	01_0001_01_0001	44100		16		2.570	55.939
 
-        ## 5. SPEAKER.TXT  
-        ## SPKID	SEX	AGE	ACC
-        ## SPEAKER0001	F	25	China, Wu, Jiangsu
-        ## SCD	SEX	AGE	ACC
-        ## 0000	F	45	China, Jilin
-        for spk in vec_spk_chn:
-            vec_write_ses=[];
-            vec_write_ses.append(spk);
-            vec_write_ses.append(map_spk[spk]['SEX']);
-            vec_write_ses.append(map_spk[spk]['AGE']);
-            vec_write_ses.append(map_spk[spk]['ACC']);
-            write_session('SPEAKER', vec_write_ses);
+    ### 原始格式 :
+    ### SPKRID	SESID	UTTID	SAMPRATE	BITS	DUR	SNR	CLP	MAXAMP	MEANAMP
+    ### 0000	0	000000001	16000	16	3.475	22.165	0.000	-11.070824149477	0
+    ### 第3列wav的id 是map的key 通过它来查找...
+    #for utt in map_smp.keys():
+    #    ## 300000001  ABBBBCDDD
+    #    utt_chn=utt[0]
+    #    utt_spk=utt[1:5]
+    #    utt_ses=utt[5]
+    #    utt_wav=utt[6:]
+    #    ##print("test:%s\t%s\t%s\t%s\t%s"%(utt, utt_chn, utt_spk, utt_ses, utt_wav));
+    #    if utt_chn == CHN and utt_spk in vec_spk_chn:
+    #        vec_write_ses=[];
+    #        vec_write_ses.append(utt_spk);
+    #        vec_write_ses.append(map_ses[utt_spk][CHN]['CAR']);
+    #        vec_write_ses.append(utt);
+    #        vec_write_ses.append(map_smp[utt]['SAMPRATE']);
+    #        vec_write_ses.append(map_smp[utt]['BITS']);
+    #        vec_write_ses.append(map_smp[utt]['DUR']);
+    #        vec_write_ses.append(map_smp[utt]['SNR']);
+    #        write_session('SAMPSTAT', vec_write_ses);
+
+    ### 5. SPEAKER.TXT  
+    ### SPKID	SEX	AGE	ACC
+    ### SPEAKER0001	F	25	China, Wu, Jiangsu
+    ### SCD	SEX	AGE	ACC
+    ### 0000	F	45	China, Jilin
+    #for spk in vec_spk_chn:
+    #    vec_write_ses=[];
+    #    vec_write_ses.append(spk);
+    #    vec_write_ses.append(map_spk[spk]['SEX']);
+    #    vec_write_ses.append(map_spk[spk]['AGE']);
+    #    vec_write_ses.append(map_spk[spk]['ACC']);
+    #    write_session('SPEAKER', vec_write_ses);
 
 
     return map_sel.keys();
@@ -973,8 +923,7 @@ if __name__ == '__main__':
     ###  2. 根据各种信息均衡 挑选出50*3个说话人 
     ##### 每个设备(channel)内选取  50人 
     ##### 按照一定的标准  选取出NUM_SEL个spk
-    ### vec_res_spk=select_spk(map_spk, map_ses);
-    #vec_res_spk = select_spk_chn(map_spk, map_ses);
+    vec_res_spk = select_spk_chn(map_spk, map_ses);
 
     ##### 获取map_spk 中 ['3550', '3330', '3770', '3380'] 个speaker 对应的所有SEX列
     ##### 统计这些spk的各项信息 比例 
