@@ -748,3 +748,84 @@ AKG C400BL	2480	SPEAKER0297
 AKG C400BL	0310	SPEAKER0298
 AKG C400BL	0070	SPEAKER0299
 AKG C400BL	0700	SPEAKER0300
+
+
+最终数据库的统计信息:
+
+
+statistic: SEX	num:
+F	140
+M	160
+
+
+statistic: AGE	num:
+18	8
+19	42
+20	43
+21	30
+22	18
+23	8
+24	16
+25	4
+26	6
+27	2
+28	7
+29	2
+31	1
+32	2
+33	3
+34	1
+35	6
+36	16
+37	9
+38	7
+39	6
+40	7
+41	3
+42	8
+43	11
+44	12
+45	22
+
+
+statistic: ACC	num:
+China, Anhui	9
+China, Beijing	24
+China, Fujian	6
+China, Gansu	14
+China, Guangdong	3
+China, Guangxi	8
+China, Guizhou	2
+China, Hainan	1
+China, Hebei	30
+China, Heilongjiang	19
+China, Henan	21
+China, Hubei	9
+China, Hunan	7
+China, Inner Mongolia	6
+China, Jiangsu	7
+China, Jiangxi	4
+China, Jilin	14
+China, Liaoning	14
+China, Ningxia	4
+China, Qinghai	2
+China, Shaanxi	12
+China, Shandong	28
+China, Shanghai	2
+China, Shanxi	30
+China, Sichuan	7
+China, Tianjin	6
+China, Xinjiang	1
+China, Yunnan	7
+China, Zhejiang	3
+
+
+statistic: SESID	num:
+SESSION01	170
+SESSION02	130
+
+
+statistic: DVCID	num:
+DEVICE01	100
+DEVICE02	100
+DEVICE03	100

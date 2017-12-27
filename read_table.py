@@ -132,10 +132,21 @@ def count_rate_1(map_tab, key):
 
     items = map_count.items();
     items.sort()
-    print("\n%s\tnum"%(key));
+    print("\n\nstatistic: %s\tnum:"%(key));
     for kk,vv in items:
         print("%s\t%d"%(kk,map_count[kk]))
         
+
+## 统计最终的 tabel 文件(都有独立唯一的key了)
+## key_num: 表示第几列是 主key
+## vec_key: ['SEX','AGE']
+def statistic_table(file_in, key_num, vec_key):
+    map_tmp={};
+    load_table_1(file_in, map_tmp, key_num);
+    for kk in vec_key:
+        ## 随机取一个 spk  就是为了得到map_tmp 对应的列
+        count_rate_1(map_tmp, kk)
+    
     
 ##    SESSION.TXT
 ##    一个 SPEAKER  对应 CHN=0123
@@ -965,6 +976,18 @@ if __name__ == '__main__':
 
     ## 创建script目录 和 重新命名所有script  
     create_script();
+
+
+    print("\n\n最终数据库的统计信息:");
+    ### 对于最终生成的库   统计 DEVICE  SESSION AGE SEX ACC 等比例 
+    ### SPKID	SEX	AGE	ACC
+    vec_tmp=('SEX','AGE','ACC');
+    statistic_table("%s/SPEAKER.txt"%(king_out_table), 1, vec_tmp);
+
+    vec_tmp=('SESID','DVCID');
+    statistic_table("%s/SESSION.txt"%(king_out_table), 2, vec_tmp);
+
+
 
     sys.exit(0);
 
