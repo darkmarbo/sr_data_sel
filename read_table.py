@@ -570,7 +570,7 @@ def write_session(flag, vec_in):
 ## 转换 010600016  ---->  AA_BBBB_CC_DDDD
 def trans_wav(name):
 
-    chn=int(name[0]);
+    chn=int(name[0]) + 1;
     spk=trans_spk[name[1:5]][-4:];
 
     ##ses=int(name[5]);
@@ -585,7 +585,7 @@ def trans_wav(name):
 ## 转换 0 1060 0  ---->  AA_BBBB_CC
 def trans_scp(name):
 
-    chn=int(name[0]);
+    chn=int(name[0]) + 1;
     spk=trans_spk[name[1:5]][-4:];
 
     ##ses=int(name[5]);
@@ -743,8 +743,75 @@ def format_table():
     ### todo  使用 sample文件中的 dur信息 重写SESSION文件
     ## SPKID   SESID   UTTID   SAMPRATE    BITS    DUR SNR
     ## SPEAKER0051 SESSION01   00_0051_01_0016 16000   16  3.129   18.305
+    fp_smp=open("%s/SAMPSTAT.txt"%(king_out_table));
+    fp_ses=open("%s/SESSION.txt"%(king_out_table));
+    map_spk_smp={};  ### 记录每个spk对应的: UTN TOTDUR  MINDUR  MAXDUR 
+    flag=0;
+    for line in fp_smp:
+
+        line=line.strip();
+        vec_line=line.split("\t");
+        if flag == 0:
+           flag=1;
+           continue;
+        
+        spk=vec_line[0];
+        dur=float(vec_line[5]);
+        if map_spk_smp.has_key(spk):
+            map_spk_smp[spk]['UTN'] += 1;
+            map_spk_smp[spk]['TOTDUR'] += dur;
+            if map_spk_smp[spk]['MINDUR'] > dur:
+                map_spk_smp[spk]['MINDUR'] = dur;
+            if map_spk_smp[spk]['MAXDUR'] < dur:
+                map_spk_smp[spk]['MAXDUR'] = dur;
+        else:
+            map_spk_smp[spk] = {};
+            map_spk_smp[spk]['UTN'] = 1;
+            map_spk_smp[spk]['TOTDUR'] = dur;
+            map_spk_smp[spk]['MINDUR'] = dur;
+            map_spk_smp[spk]['MAXDUR'] = dur;
+
+
     ## DVCID	SPKID	SESID	NSC	UTN	TOTDUR	MINDUR	MAXDUR	AVEDUR
     ## DEVICE01	SPEAKER0001	SESSION02	noisy	220
+    ### 读 SESSION.txt 中每行 
+    fp_ses_out=open("%s/SESSION_out.txt"%(king_out_table), "w");
+    flag=0
+    for line in fp_ses:
+
+        line=line.strip();
+        vec_line=line.split("\t");
+        if flag == 0:
+           flag=1;
+           fp_ses_out.write("%s\n"%(line)); 
+           continue;
+
+        for vv in vec_line[0:4]:
+           fp_ses_out.write("%s\t"%(vv)); 
+
+        spk = vec_line[1];
+        utn=vec_line[4];
+        utn_2=map_spk_smp[spk]['UTN'];
+        totdur=map_spk_smp[spk]['TOTDUR'];
+        mindur=map_spk_smp[spk]['MINDUR'];
+        maxdur=map_spk_smp[spk]['MAXDUR'];
+
+        avedur=totdur/utn_2;
+
+        fp_ses_out.write("%d"%(utn_2)); 
+        fp_ses_out.write("\t%.2f"%(totdur)); 
+        fp_ses_out.write("\t%.2f"%(mindur)); 
+        fp_ses_out.write("\t%.2f"%(maxdur)); 
+        fp_ses_out.write("\t%.2f\n"%(avedur)); 
+        
+
+    fp_smp.close();
+    fp_ses.close();
+    fp_ses_out.close();
+    ###  将 SESSION_out.txt 替换 SESSION.txt
+
+    ##shutil.remove("%s/SESSION.txt"%(king_out_table));
+    shutil.move("%s/SESSION_out.txt"%(king_out_table) ,"%s/SESSION.txt"%(king_out_table));
 
 
 ## 生成wav的最终格式  所有wav和目录重命名 
