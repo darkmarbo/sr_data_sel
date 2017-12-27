@@ -12,6 +12,12 @@ head -1 King-ASR-358_out2/TABLE/SAMPSTAT.txt > ttt
 tail -n +2 King-ASR-358_out2/TABLE/SAMPSTAT.txt  | sort -k1  >> ttt
 mv  ttt King-ASR-358_out2/TABLE/SAMPSTAT.txt
 
+### 修改所有的script文件中的 <SSS/>
+find King-ASR-358_out2/DATA  -iname "*.txt"|while read file
+do
+    sed -i 's/<[A-Z]\+\/>//g' $file
+done
+
 ### 统一命名规则 
 
 
