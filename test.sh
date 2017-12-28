@@ -3,8 +3,8 @@
 
 
 
-#####  King_ASR_358: 
-##### DEVICE01-03  SESSION01-02
+######  King_ASR_358: 
+###### DEVICE01-03  SESSION01-02
 #rm -rf King-ASR-358_ou*
 #python2.7 read_table.py  > King-ASR-358.log 
 #
@@ -25,9 +25,26 @@
 ### king_asr_429:
 #### DEVICE04-07  SESSION03-04
 king=King-ASR-429
+king_out=${king}_out
 dos2unix ${king}/TABLE/*
 rm -rf ${king}_ou*
 python2.7 rrr_429.py  > ${king}.log 
+
+#### 排序 
+file=${king_out}/TABLE/SAMPSTAT.txt
+head -1 ${file} > ttt
+tail -n +2  ${file}  | sort -k1  >> ttt
+mv   ttt  ${file}
+
+file=${king_out}/TABLE/SESSION.txt
+head -1 ${file} > ttt
+tail -n +2  ${file}  | sort -k1  >> ttt
+mv   ttt  ${file}
+
+file=${king_out}/TABLE/SPEAKER.txt
+head -1 ${file} > ttt
+tail -n +2  ${file}  | sort -k1  >> ttt
+mv   ttt  ${file}
 
 
 

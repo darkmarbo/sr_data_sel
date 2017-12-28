@@ -6,7 +6,7 @@ import string
 import shutil
 
 ## 是否生成wav语音  耗时 
-flag_wav=0
+flag_wav=1
 
 ### 去掉channel=3 其他012的chn 只要知道设备dvc和spk  就能唯一确定数据
 

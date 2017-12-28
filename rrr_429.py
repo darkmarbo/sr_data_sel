@@ -30,7 +30,7 @@ import shutil
 '''
 
 ## 是否生成wav语音  耗时 
-flag_wav=0
+flag_wav=1
 
 king="King-ASR-429"
 king_table="%s/TABLE"%(king)
@@ -661,7 +661,7 @@ def format_table_2():
 
 
 
-    ## SAMPSTAT.txt:
+    ## 3. SAMPSTAT.txt:
     ## 原始:
     ## SPKID	SESID	UTTID	SAMPRATE	BITS	DUR	SNR
     ## 0248	noisy	002480043	16000	16	1.652	19.242
@@ -701,10 +701,9 @@ def format_table_2():
     fp_smp_out.close();
 
 
-    '''
-    ### 使用 sample文件中的 dur信息 重写SESSION文件
-    ## SPKID   SESID   UTTID   SAMPRATE    BITS    DUR SNR
-    ## SPEAKER0051 SESSION01   00_0051_01_0016 16000   16  3.129   18.305
+    ### 4. 使用 sample文件中的 dur信息 重写SESSION文件
+    ## SPKID	SESID	UTTID	SAMPRATE	BITS	DUR	SNR
+    ## SPEAKER0343	SESSION03	07_0343_03_0043	16000	16	1.652	19.242
     fp_smp=open("%s/SAMPSTAT.txt"%(king_out_table));
     fp_ses=open("%s/SESSION.txt"%(king_out_table));
     map_spk_smp={};  ### 记录每个spk对应的: UTN TOTDUR  MINDUR  MAXDUR 
@@ -734,9 +733,9 @@ def format_table_2():
             map_spk_smp[spk]['MAXDUR'] = dur;
 
 
+    ### 读 SESSION.txt 中每行 
     ## DVCID	SPKID	SESID	NSC	UTN	TOTDUR	MINDUR	MAXDUR	AVEDUR
     ## DEVICE01	SPEAKER0001	SESSION02	noisy	220
-    ### 读 SESSION.txt 中每行 
     fp_ses_out=open("%s/SESSION_out.txt"%(king_out_table), "w");
     flag=0
     for line in fp_ses:
@@ -774,95 +773,94 @@ def format_table_2():
 
     ##shutil.remove("%s/SESSION.txt"%(king_out_table));
     shutil.move("%s/SESSION_out.txt"%(king_out_table) ,"%s/SESSION.txt"%(king_out_table));
-    '''
 
 
-## 生成wav的最终格式  所有wav和目录重命名 
-## 原始: DATA/CHANNEL2/WAVE/SPEAKER3010/SESSION0/230100188.WAV
-## 新的: DATA/DEVICE02/WAVE/SPEAKER0001/SESSION2/02_0001_02_0188.wav
+## 生成 wav 的最终格式  所有wav和目录重命名 
+## 原始: DATA/CHANNEL0/WAVE/SPEAKER0010/SESSION0/000100001.WAV
+## 新的: DATA/DEVICE04/WAVE/SPEAKER0301/SESSION04/02_0001_02_0188.wav
 def rename_data():
-    ## ['CHANNEL0', 'CHANNEL1', 'CHANNEL2'] 
-    for dvc_ori in list_dvc_ori:
 
-        dvc_new = trans_dvc[dvc_ori];
+    ## 不同的 speaker 进入到不同的 session 中 
+    path_WAVE="%s/CHANNEL0/WAVE"%(king_out_data)
+    list_spk=os.listdir(path_WAVE);
+    for spk_ori in list_spk:
 
-        ## King-ASR-358_out2/DATA/DEVICE02
-        path_dvc_ori = "%s/%s"%(king_out_data, dvc_ori);
-        path_dvc_new = "%s/%s"%(king_out_data, dvc_new);
+        spk_new = trans_spk[spk_ori[-4:]]
+        dvc_new = map_spk_final[spk_new]['DVCID']
+        ses_new = map_spk_final[spk_new]['SESID']
 
+        path_spk_new="%s/%s/WAVE/%s"%(king_out_data, dvc_new, spk_new)
 
-        ## King-ASR-358_out2/DATA/DEVICE02/WAVE
-        ## 不同的 speaker 进入到不同的 session 中 
-        path_WAVE="%s/WAVE"%(path_dvc_ori)
-        list_spk=os.listdir(path_WAVE);
-        for spk_ori in list_spk:
+        path_spk_ori="%s/%s"%(path_WAVE, spk_ori)
+        path_ses_ori="%s/SESSION0"%(path_spk_ori)
+        path_ses_new="%s/%s"%(path_spk_new, ses_new)
 
-            path_spk_ori="%s/%s"%(path_WAVE, spk_ori)
-            spk_new = trans_spk[spk_ori[-4:]]
-            path_spk_new="%s/WAVE/%s"%(path_dvc_new, spk_new)
+        #print("makedirs  %s"%(path_spk_new));
+        os.makedirs(path_ses_new);
 
-            path_ses_ori="%s/SESSION0"%(path_spk_ori)
-            path_ses_new="%s/%s"%(path_spk_new, map_spk_final[spk_new]['SESID'])
-
-            #print("makedirs  %s"%(path_spk_new));
-            os.makedirs(path_ses_new);
-
-            list_wav = os.listdir(path_ses_ori);
-            for wav_ori in list_wav: 
-                ## 230100188.WAV
-                path_wav_ori = "%s/%s"%(path_ses_ori, wav_ori);
-                wav_new = "%s.WAV"%(trans_wav(wav_ori[0:9]))
-                path_wav_new = "%s/%s"%(path_ses_new, wav_new);
-                #print("mv  %s  --->  %s"%(path_wav_ori, path_wav_new));
-                shutil.move(path_wav_ori, path_wav_new);
-                ##os.rename(path_wav_ori, path_wav_new);
-
-    return 0;
+        list_wav = os.listdir(path_ses_ori);
+        for wav_ori in list_wav: 
+            ## 230100188.WAV
+            path_wav_ori = "%s/%s"%(path_ses_ori, wav_ori);
+            wav_new = "%s.WAV"%(trans_wav(wav_ori[0:9]))
+            path_wav_new = "%s/%s"%(path_ses_new, wav_new);
+            #print("mv  %s  --->  %s"%(path_wav_ori, path_wav_new));
+            shutil.move(path_wav_ori, path_wav_new);
+            ##os.rename(path_wav_ori, path_wav_new);
 
 
-## 处理所有wav对应的script  
-## King-ASR-358_out2/DATA/CHANNEL1/SCRIPT/100500.TXT
+
+## 处理所有 wav 对应的script  
+## King-ASR-429_out/DATA/CHANNEL0/SCRIPT/000300.TXT
 def rename_script():
-    ## ['CHANNEL0', 'CHANNEL1', 'CHANNEL2'] 
-    for dvc_ori in list_dvc_ori:
 
-        dvc_new = trans_dvc[dvc_ori];
+    dvc_ori='CHANNEL0'
 
-        ## King-ASR-358_out2/DATA/DEVICE02/SCRIPT
-        path_scp_ori = "%s/%s/SCRIPT"%(king_out_data, dvc_ori);
+    ## King-ASR-429_out/DATA/CHANNEL0/SCRIPT
+    path_scp_ori = "%s/%s/SCRIPT"%(king_out_data, dvc_ori);
+    list_scp=os.listdir(path_scp_ori);
+    for scp_ori in list_scp:
+
+        spk_ori=scp_ori[1:5]
+        spk_new = trans_spk[spk_ori]
+        dvc_new = map_spk_final[spk_new]['DVCID']
+        scp_new = "%s.TXT"%(trans_scp(scp_ori[0:6]));
+
         path_scp_new = "%s/%s/SCRIPT"%(king_out_data, dvc_new);
-        os.makedirs(path_scp_new);
-        list_scp=os.listdir(path_scp_ori);
-        for scp_ori in list_scp:
-            scp_new = "%s.TXT"%(trans_scp(scp_ori[0:6]));
+        if not os.path.isdir(path_scp_new):
+            os.makedirs(path_scp_new);
 
-            fp_in=open("%s/%s"%(path_scp_ori, scp_ori))
-            fp_out=open("%s/%s"%(path_scp_new, scp_new), "w")
-            ##100500001	拨打张瑜的133的电话
-            ##	拨打张瑜的幺三三的电话
-            num_line=0;
-            for line in fp_in:
+        file_tmp_in="%s/%s"%(path_scp_ori, scp_ori);
+        os.system('dos2unix %s '%(file_tmp_in));
 
-                num_line += 1;
+        fp_in=open("%s/%s"%(path_scp_ori, scp_ori))
+        fp_out=open("%s/%s"%(path_scp_new, scp_new), "w")
 
-                line=line.strip();
-                if line == "":
-                    continue;
+        ##100500001	拨打张瑜的133的电话
+        ##	拨打张瑜的幺三三的电话
+        num_line=0;
+        for line in fp_in:
 
-                vec_line = line.split("\t");
+            num_line += 1;
 
-                if num_line%2 == 1:
-                    fp_out.write("%s\t"%(trans_wav(vec_line[0])));
-                else:
-                    fp_out.write("%s\n"%(vec_line[0]));
+            line=line.strip();
+            if line == "":
+                continue;
 
-            fp_in.close();
-            fp_out.close();
+            vec_line = line.split("\t");
 
-        ## 删除其他无用数据 
-        ## King-ASR-358_out2/DATA/CHANNEL
-        dir_rm="%s/%s"%(king_out_data, dvc_ori)
-        shutil.rmtree(dir_rm);
+            if num_line%2 == 1:
+                fp_out.write("%s\t"%(trans_wav(vec_line[0])));
+            else:
+                fp_out.write("%s\n"%(vec_line[0]));
+
+        fp_in.close();
+        fp_out.close();
+
+    ## 删除其他无用数据 
+    ## King-ASR-358_out2/DATA/CHANNEL
+    dir_rm="%s/%s"%(king_out_data, dvc_ori)
+    shutil.rmtree(dir_rm);
 
 
 if __name__ == '__main__':
@@ -922,11 +920,11 @@ if __name__ == '__main__':
 
 
     ### 重新命名所有wav和相关目录 
-    #if flag_wav == 1:
-    #    rename_data();
+    if flag_wav == 1:
+        rename_data();
 
     ### 创建script目录 和 重新命名所有script  
-    #rename_script();
+    rename_script();
 
 
     #print("\n\n最终数据库的统计信息:");
