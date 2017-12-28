@@ -6,7 +6,7 @@ import string
 import shutil
 
 '''
-    king_asr_429 数据库 
+    King-ASR-429 数据库 
     300个SPEAKER   每个SPEAKER 包含116句
     根据 DVC NSC SEX AGE ACC 均衡 选取总计 200人 
 
@@ -23,14 +23,16 @@ import shutil
 
     CHN SES REP ENV 都是固定值 没啥用  
 
+    -----------------------------------------
+    提取出200人 总计23184个wav
+
+
 '''
 
 ## 是否生成wav语音  耗时 
 flag_wav=0
 
-### 去掉channel=3 其他012的chn 只要知道设备dvc和spk  就能唯一确定数据
-
-king="king_429_test"
+king="King-ASR-429"
 king_table="%s/TABLE"%(king)
 king_data="%s/DATA"%(king)
 
@@ -38,13 +40,14 @@ king_out="%s_out"%(king)
 king_out_table="%s/TABLE"%(king_out)
 king_out_data="%s/DATA"%(king_out)
 
-list_dvc_ori=('CHANNEL0', 'CHANNEL1', 'CHANNEL2'); 
+list_dvc_ori=('CHANNEL0'); 
 
 NUM_SEL=200 ### 每个channel 总数  
 
-trans_dvc={"SHURE WH30":"DEVICE01", "Sennheiser ME104":"DEVICE02", "AKG C400BL":"DEVICE03",               "DEVICE01":"SHURE WH30", "DEVICE02":"Sennheiser ME104", "DEVICE03":"AKG C400BL",               "CHANNEL0":"DEVICE01", "CHANNEL1":"DEVICE02", "CHANNEL2":"DEVICE03"}; 
+#### DEVICE04-07  SESSION03-04
+trans_dvc={"HTC":"DEVICE04", "Huawei":"DEVICE05", "MIUI":"DEVICE06","Samsung":"DEVICE07",                 "DEVICE04":"HTC", "DEVICE05":"Huawei", "DEVICE06":"MIUI","DEVICE07":"Samsung"}; 
 
-trans_ses={"Honda Accord":"SESSION01", "Toyota Corolla":"SESSION02",  "SESSION01":"Honda Accord", "SESSION02":"Honda Accord"};
+trans_ses={"noisy":"SESSION03","quite":"SESSION04",  "SESSION03":"noisy","SESSION04":"quite"};
 
 
 ### 记录处理过程中  原始speaker 与 新SPEAKER的对应关系 
@@ -58,30 +61,6 @@ trans_spk={}
 map_spk_final={};
 
 
-"""
-    ABBBBCDDD.wav
-    ABBBBC.TXT
-    A表示通道0123   BBBB说话人  C是session默认0     DDD语音
-
-    CHN对应0123通道 
-
-    SESSION.txt:
-    SES	SCD	CHN	DVC	REP	ENV	NSC	UTN	CAR
-    0	0000	0	SHURE WH30	China	car	noisy	220	Honda Accord
-
-    SPEAKER.txt:
-    SCD	SEX	AGE	ACC
-    0000	F	45	China, Jilin
-
-    SAMPSTAT.txt:
-    SPKRID	SESID	UTTID	SAMPRATE	BITS	DUR	SNR	CLP	MAXAMP	MEANAMP
-    0000	0	000000001	16000	16	3.475	22.165	0.000	-11.070824149477	0
-
-    CONTENT.txt
-    SCD	SES	UID	TRS
-    0000	0	000000001	打开短程极速赛车二
-
-"""
 
 
 ##    读取 SPEAKER.TXT
@@ -346,6 +325,7 @@ def count_rate_3(vec_in):
 
 ### 根据 DVC NSC SEX AGE ACC 均衡 
 ### 选取总计 200人 
+### 返回 说话人的list 
 def select_spk_chn(map_spk, map_ses):
     map_sel={}  ### 记录选取出来的SPEAKER 
 
@@ -379,8 +359,7 @@ def select_spk_chn(map_spk, map_ses):
         print(map_count[kk]);
     
 
-    print("\n 最终选取的说话人: ");
-    vec_spk_chn=[];  
+    vec_res_spk=[];  
     num_sel=0
     while(num_sel < NUM_SEL):
         for key in map_count.keys():  ### 每一个组合
@@ -390,102 +369,11 @@ def select_spk_chn(map_spk, map_ses):
                 if num_sel<NUM_SEL and (not map_sel.has_key(spk_tmp)):
                     map_sel[spk_tmp] = 1;
                     num_sel += 1;
-                    vec_spk_chn.append(spk_tmp);
-                    print(spk_tmp);
+                    vec_res_spk.append(spk_tmp);
                     break;
 
-    #### 统计当前chn 对应的 50个spk 的某个分类的比例  
-    count_rate_3( get_row_1(map_spk, vec_spk_chn, 'SEX') );
-    count_rate_3( get_row_1(map_spk, vec_spk_chn, 'AGE') );
-    count_rate_3( get_row_1(map_spk, vec_spk_chn, 'ACC') );
-    count_rate_3( get_row_1(map_ses, vec_spk_chn, 'DVC') );
-    count_rate_3( get_row_1(map_ses, vec_spk_chn, 'NSC') );
 
-    #### 拷贝相应的wav和script 到指定目录 
-    ### DATA/CHANNEL1/WAVE/SPEAKER0010/SESSION0/100100001.WAV
-    ### DATA/CHANNEL1/SCRIPT/100100.TXT
-    #for spk in vec_spk_chn:
-
-    #    if flag_wav == 1:
-    #        #### 1. wave 
-    #        #### DATA/CHANNEL0/WAVE/SPEAKER0830 里面是 SESSION0
-    #        dir_wav="%s/DATA/CHANNEL%s/WAVE/SPEAKER%s"%(king, CHN,spk)
-    #        print("test:path_dir_wav=%s"%(dir_wav));
-    #        if not os.path.isdir(dir_wav):
-    #            print("error:path=%s not exist!"%(dir_wav));
-    #            sys.exit(0);
-    #        dir_wav_out="%s/DATA/CHANNEL%s/WAVE"%(king_out, CHN)
-    #        if not os.path.isdir(dir_wav_out):
-    #            os.makedirs(dir_wav_out);
-    #        shutil.copytree(dir_wav, "%s/SPEAKER%s"%(dir_wav_out,spk));
-
-    #    #### 2. script   ABBBBC.TXT
-    #    ### DATA/CHANNEL1/SCRIPT/100100.TXT
-    #    file_name="%s%s0"%(CHN,spk)
-    #    file_scp="%s/DATA/CHANNEL%s/SCRIPT/%s.TXT"%(king, CHN,file_name)
-    #    if not os.path.isfile(file_scp):
-    #        print("errror:file=%s not exist!"%(file_scp));
-    #        sys.exit(0);
-    #    dir_scp_out="%s/DATA/CHANNEL%s/SCRIPT"%(king_out, CHN)
-    #    file_scp_out="%s/%s.TXT"%(dir_scp_out, file_name)
-    #    if not os.path.isdir(dir_scp_out):
-    #        os.makedirs(dir_scp_out);
-    #    shutil.copy(file_scp, file_scp_out);
-
-    ### 3. SESSION.TXT
-    ##DVCID		SPKID		SESID		NSC		UTN	TOTDUR	MINDUR	MAXDUR	AVEDUR
-    ##DEVICE01	SPEAKER0001	SESSION01	quiet	100	xx		xx		xx		xx
-    #for spk in vec_spk_chn:
-    #    vec_write_ses=[];
-    #    vec_write_ses.append(map_ses[spk][CHN]['DVC']);
-    #    vec_write_ses.append(map_ses[spk][CHN]['SCD']);
-    #    vec_write_ses.append(map_ses[spk][CHN]['CAR']);
-    #    vec_write_ses.append('noisy');
-    #    vec_write_ses.append(map_ses[spk][CHN]['UTN']);
-    #    write_session('SESSION', vec_write_ses);
-
-    ### 4. SAMPSTAT.TXT
-    ### 新格式 
-    ##SPKID		SESID		UTTID				SAMPRATE	BITS	DUR		SNR	
-    ##SPEAKER0001	SESSION01	01_0001_01_0001	44100		16		2.570	55.939
-
-    ### 原始格式 :
-    ### SPKRID	SESID	UTTID	SAMPRATE	BITS	DUR	SNR	CLP	MAXAMP	MEANAMP
-    ### 0000	0	000000001	16000	16	3.475	22.165	0.000	-11.070824149477	0
-    ### 第3列wav的id 是map的key 通过它来查找...
-    #for utt in map_smp.keys():
-    #    ## 300000001  ABBBBCDDD
-    #    utt_chn=utt[0]
-    #    utt_spk=utt[1:5]
-    #    utt_ses=utt[5]
-    #    utt_wav=utt[6:]
-    #    ##print("test:%s\t%s\t%s\t%s\t%s"%(utt, utt_chn, utt_spk, utt_ses, utt_wav));
-    #    if utt_chn == CHN and utt_spk in vec_spk_chn:
-    #        vec_write_ses=[];
-    #        vec_write_ses.append(utt_spk);
-    #        vec_write_ses.append(map_ses[utt_spk][CHN]['CAR']);
-    #        vec_write_ses.append(utt);
-    #        vec_write_ses.append(map_smp[utt]['SAMPRATE']);
-    #        vec_write_ses.append(map_smp[utt]['BITS']);
-    #        vec_write_ses.append(map_smp[utt]['DUR']);
-    #        vec_write_ses.append(map_smp[utt]['SNR']);
-    #        write_session('SAMPSTAT', vec_write_ses);
-
-    ### 5. SPEAKER.TXT  
-    ### SPKID	SEX	AGE	ACC
-    ### SPEAKER0001	F	25	China, Wu, Jiangsu
-    ### SCD	SEX	AGE	ACC
-    ### 0000	F	45	China, Jilin
-    #for spk in vec_spk_chn:
-    #    vec_write_ses=[];
-    #    vec_write_ses.append(spk);
-    #    vec_write_ses.append(map_spk[spk]['SEX']);
-    #    vec_write_ses.append(map_spk[spk]['AGE']);
-    #    vec_write_ses.append(map_spk[spk]['ACC']);
-    #    write_session('SPEAKER', vec_write_ses);
-
-
-    return map_sel.keys();
+    return vec_res_spk;
 
 
 
@@ -550,8 +438,9 @@ def write_session(flag, vec_in):
 ## 转换 010600016  ---->  AA_BBBB_CC_DDDD
 def trans_wav(name):
 
-    chn=int(name[0]) + 1;
+    ##chn=int(name[0]) + 1;
     spk=trans_spk[name[1:5]][-4:];
+    chn=int(map_spk_final[trans_spk[name[1:5]]]['DVCID'][-2:]);
 
     ##ses=int(name[5]);
     ses=int(map_spk_final[trans_spk[name[1:5]]]['SESID'][-2:]);
@@ -565,8 +454,9 @@ def trans_wav(name):
 ## 转换 0 1060 0  ---->  AA_BBBB_CC
 def trans_scp(name):
 
-    chn=int(name[0]) + 1;
+    ##chn=int(name[0]) + 1;
     spk=trans_spk[name[1:5]][-4:];
+    chn=int(map_spk_final[trans_spk[name[1:5]]]['DVCID'][-2:]);
 
     ##ses=int(name[5]);
     ses=int(map_spk_final[trans_spk[name[1:5]]]['SESID'][-2:]);
@@ -576,40 +466,128 @@ def trans_scp(name):
     return name_new;
 
 
+
+'''
+    根据提取出  200 个spk
+    把相应 wav script  table 数据拷贝出来  
+'''
+def format_table_1(vec_spk_chn):
+    ### 拷贝相应的wav和script 到指定目录 
+    CHN='0'
+    for spk in vec_spk_chn:
+        if flag_wav == 1:
+            #### 1. wave ABBBBCDDD.wav 
+            ## King-ASR-429/DATA/CHANNEL0/WAVE/SPEAKER0001/SESSION0/000010001.WAV
+            dir_wav="%s/DATA/CHANNEL%s/WAVE/SPEAKER%s"%(king, CHN,spk)
+            print("test:path_dir_wav=%s"%(dir_wav));
+            if not os.path.isdir(dir_wav):
+                print("error:path=%s not exist!"%(dir_wav));
+                sys.exit(0);
+            dir_wav_out="%s/DATA/CHANNEL%s/WAVE"%(king_out, CHN)
+            if not os.path.isdir(dir_wav_out):
+                os.makedirs(dir_wav_out);
+            shutil.copytree(dir_wav, "%s/SPEAKER%s"%(dir_wav_out,spk));
+
+        #### 2. script   ABBBBC.TXT
+        ## King-ASR-429/DATA/CHANNEL0/SCRIPT/000010.TXT
+        file_name="%s%s0"%(CHN,spk)
+        file_scp="%s/DATA/CHANNEL%s/SCRIPT/%s.TXT"%(king, CHN,file_name)
+        if not os.path.isfile(file_scp):
+            print("errror:file=%s not exist!"%(file_scp));
+            sys.exit(0);
+        dir_scp_out="%s/DATA/CHANNEL%s/SCRIPT"%(king_out, CHN)
+        file_scp_out="%s/%s.TXT"%(dir_scp_out, file_name)
+        if not os.path.isdir(dir_scp_out):
+            os.makedirs(dir_scp_out);
+        shutil.copy(file_scp, file_scp_out);
+
+    ### 3. SESSION.TXT
+    ### 新格式 
+    ##  DVCID		SPKID		SESID		NSC		UTN	TOTDUR	MINDUR	MAXDUR	AVEDUR
+    ##  DEVICE01	SPEAKER0001	SESSION01	quiet	100	xx		xx		xx		xx
+    ### 原始格式 :
+    ## SES	SCD	CHN	DVC	REP	ENV	NSC	UTN
+    ## 0	0001	0	Samsung	China	office	quite	116
+    for spk in vec_spk_chn:
+        vec_write_ses=[];
+        vec_write_ses.append(map_ses[spk]['DVC']);  ## DVCID
+        vec_write_ses.append(map_ses[spk]['SCD']);  ## SPKID
+        ##  ENV=office一样的  所以使用NSC=[noisy,quite]来代替SESSION
+        vec_write_ses.append(map_ses[spk]['NSC']);  ## SESID
+        vec_write_ses.append(map_ses[spk]['NSC']);  ## NSC
+        vec_write_ses.append(map_ses[spk]['UTN']);
+        write_session('SESSION', vec_write_ses);
+
+
+
+
+    ### 4. SAMPSTAT.TXT
+    ### 新格式 
+    ##SPKID		SESID		UTTID				SAMPRATE	BITS	DUR		SNR	
+    ##SPEAKER0001	SESSION01	01_0001_01_0001	44100		16		2.570	55.939
+    ### 原始格式 :
+    ### SPKRID	SESID	UTTID	SAMPRATE	BITS	DUR	SNR	CLP	MAXAMP	MEANAMP
+    ### 0300	0	003000001	16000	16	1.790	20.854	0.000	-5.65440062727062	-14
+    ### 第3列wav的id 是map的key 通过它来查找...
+    for utt in map_smp.keys():
+        ## 300000001  ABBBBCDDD
+        utt_chn=utt[0]
+        utt_spk=utt[1:5]
+        utt_ses=utt[5]
+        utt_wav=utt[6:]
+        ##print("test:%s\t%s\t%s\t%s\t%s"%(utt, utt_chn, utt_spk, utt_ses, utt_wav));
+        if utt_chn == CHN and utt_spk in vec_spk_chn:
+            vec_write_ses=[];
+            vec_write_ses.append(utt_spk);
+            vec_write_ses.append(map_ses[utt_spk]['NSC']);
+            vec_write_ses.append(utt);
+            vec_write_ses.append(map_smp[utt]['SAMPRATE']);
+            vec_write_ses.append(map_smp[utt]['BITS']);
+            vec_write_ses.append(map_smp[utt]['DUR']);
+            vec_write_ses.append(map_smp[utt]['SNR']);
+            write_session('SAMPSTAT', vec_write_ses);
+
+
+
+    ### 5. SPEAKER.TXT  
+    ### SPKID	SEX	AGE	ACC
+    ### SPEAKER0001	F	25	China, Wu, Jiangsu
+    ### SCD	SEX	AGE	ACC
+    ### 0001	M	35	China, Liaoning,
+    for spk in vec_spk_chn:
+        vec_write_ses=[];
+        vec_write_ses.append(spk);
+        vec_write_ses.append(map_spk[spk]['SEX']);
+        vec_write_ses.append(map_spk[spk]['AGE']);
+        vec_write_ses.append(map_spk[spk]['ACC']);
+        write_session('SPEAKER', vec_write_ses);
+
+
+
 """
     ### 格式固定之后  转换内容 名字等  
     ABBBBCDDD.wav
     ABBBBC.TXT
-    A表示通道0123   BBBB说话人  C是session默认0     DDD语音
-
-
-
-
-    需要从script目录下统计  
-    CONTENT.txt
-    SPKID	SESID	UTTID	    TRS
-    0000	0	    000000001	打开短程极速赛车二
+    A表示通道0   BBBB说话人  C是session默认0     DDD语音
 
 """
-def format_table():
-    ### DATA/DEVICE01/WAVE/SPEAKER0001/SESSION01
+def format_table_2():
 
-
-
-    ## SESSION.txt:
-    ## DVCID	    SPKID	SESID	        NSC	    UTN	TOTDUR	MINDUR	MAXDUR	AVEDUR
-    ## SHURE WH30	0830	Toyota Corolla	noisy	220
+    ## 1.  SESSION.txt:
+    ## 原始:
+    ## DVCID	SPKID	SESID	NSC	UTN	TOTDUR	MINDUR	MAXDUR	AVEDUR
+    ## Samsung	0238	noisy	noisy	116
     ## 结果:
     ## DVCID		SPKID		SESID		NSC		UTN	TOTDUR	MINDUR	MAXDUR	AVEDUR
-    ## DEVICE01	SPEAKER0001	SESSION01	quiet	100	xx		xx		xx		xx
+    ## DEVICE04	SPEAKER0301	SESSION03	quiet	100	xx		xx		xx		xx
     #######  1. SESSION.TXT 输入  SESSION.txt 输出 
     fp_ses=open("%s/SESSION.TXT"%(king_out_table));
     fp_ses_out=open("%s/SESSION.txt"%(king_out_table), "w");
     flag=0;
-    num_spk=0;
+    num_spk=300; ## 第一个库已经提取了300人 
 
     print("\ntrans_spk: 最终选取的说话人原始ID的转换:");
-    print("dvc_ori\tspk_ori\tspk_new\t");
+    print("dvc_ori\tspk_ori\tspk_new\t:::");
     for line in fp_ses:
 
         line=line.strip();
@@ -621,21 +599,21 @@ def format_table():
            continue;
         
         ## 转换 
-        dvc = trans_dvc[vec_line[0]];
-        ses = trans_ses[vec_line[2]];
+        dvc = trans_dvc[vec_line[0]]; ## Samsung
+        ses = trans_ses[vec_line[2]]; ## noisy
+
         spk_ori = vec_line[1];
         num_spk += 1;
         spk_new = "SPEAKER%04d"%(num_spk);
 
         ### 记录所有spk的信息  
-        ## SPKID    DVCID  SESID	    NSC	    UTN	    TOTDUR	MINDUR	MAXDUR	AVEDUR
         map_spk_final[spk_new]={};
         map_spk_final[spk_new]['DVCID']=dvc;
         map_spk_final[spk_new]['SESID']=ses;
 
         trans_spk[spk_ori] = spk_new;
         trans_spk[spk_new] = spk_ori;
-        print("%s\t%s\t%s"%(vec_line[0],spk_ori, spk_new));
+        print("%s\t%s  --->  %s"%(vec_line[0], spk_ori, spk_new));
 
         fp_ses_out.write("%s\t%s\t%s"%(dvc, spk_new, ses));
         for value in vec_line[3:]:
@@ -646,13 +624,12 @@ def format_table():
     fp_ses.close();
     fp_ses_out.close();
 
-    ### 重新读取新的SESSION.txt 文件  得到map_spk_final 
-    ##load_table_1("%s/SESSION.txt"%(king_out_table), map_spk_final, 2);
     
 
-    ## SPEAKER.txt:
+    ## 2.  SPEAKER.txt:
+    ## 原始:
     ## SPKID	SEX	AGE	ACC
-    ## 0830	M	20	China, Jiangxi
+    ## 0238	M	24	China, Hebei,
     ## 结果
     ## SPKID		SEX	AGE	ACC
     ## SPEAKER0001	F	25	China, Wu, Jiangsu
@@ -682,9 +659,12 @@ def format_table():
     fp_spk.close();
     fp_spk_out.close();
 
+
+
     ## SAMPSTAT.txt:
-    ## SPKID	SESID	        UTTID	    SAMPRATE	BITS	DUR	    SNR
-    ## 1660	Toyota Corolla	016600150	16000	    16	    1.994	28.898
+    ## 原始:
+    ## SPKID	SESID	UTTID	SAMPRATE	BITS	DUR	SNR
+    ## 0248	noisy	002480043	16000	16	1.652	19.242
     ## 结果:
     ## SPKID		SESID		UTTID				SAMPRATE	BITS	DUR		SNR	
     ## SPEAKER0001	SESSION01	01_0001_01_0001	44100		16		2.570	55.939
@@ -707,7 +687,8 @@ def format_table():
         ## 转换 session 
         ses_new  = trans_ses[vec_line[1]];
         fp_smp_out.write("\t%s"%(ses_new));
-        ## 转换 UTTID  010600016: ABBBBCDDD.wav
+        ## 转换 UTTID   ABBBBCDDD.wav   --->  AA_BBBB_CC_DDDD.wav
+        ## 01_0001_01_0001 44100 其中AA和CC 都用map_spk_final 来查找 
         wav_new=trans_wav(vec_line[2]);
         fp_smp_out.write("\t%s"%(wav_new));
 
@@ -720,7 +701,8 @@ def format_table():
     fp_smp_out.close();
 
 
-    ### todo  使用 sample文件中的 dur信息 重写SESSION文件
+    '''
+    ### 使用 sample文件中的 dur信息 重写SESSION文件
     ## SPKID   SESID   UTTID   SAMPRATE    BITS    DUR SNR
     ## SPEAKER0051 SESSION01   00_0051_01_0016 16000   16  3.129   18.305
     fp_smp=open("%s/SAMPSTAT.txt"%(king_out_table));
@@ -792,6 +774,7 @@ def format_table():
 
     ##shutil.remove("%s/SESSION.txt"%(king_out_table));
     shutil.move("%s/SESSION_out.txt"%(king_out_table) ,"%s/SESSION.txt"%(king_out_table));
+    '''
 
 
 ## 生成wav的最终格式  所有wav和目录重命名 
@@ -839,7 +822,7 @@ def rename_data():
 
 ## 处理所有wav对应的script  
 ## King-ASR-358_out2/DATA/CHANNEL1/SCRIPT/100500.TXT
-def create_script():
+def rename_script():
     ## ['CHANNEL0', 'CHANNEL1', 'CHANNEL2'] 
     for dvc_ori in list_dvc_ori:
 
@@ -893,7 +876,7 @@ if __name__ == '__main__':
     ## SCD	SEX	AGE	ACC
     ## 0001	M	35	China, Liaoning,
     map_spk={}
-    load_table_1("%s/speaker.txt"%(king_table), map_spk, 1);
+    load_table_1("%s/SPEAKER.TXT"%(king_table), map_spk, 1);
     ##out_table_1(map_spk);
     count_rate_1(map_spk, 'SEX')
     count_rate_1(map_spk, 'AGE')
@@ -903,7 +886,7 @@ if __name__ == '__main__':
     ## SPKRID	SESID	UTTID	SAMPRATE	BITS	DUR	SNR	CLP	MAXAMP	MEANAMP
     ## 0300	0	003000001	16000	16	1.790	20.854	0.000	-5.65440062727062	-14
     map_smp={}
-    load_table_1("%s/sampstat.txt"%(king_table), map_smp, 3);
+    load_table_1("%s/SAMPSTAT.TXT"%(king_table), map_smp, 3);
     #out_table_1(map_smp);
     #count_rate_1(map_smp, 'SPKRID')
     #count_rate_1(map_smp, 'SESID')
@@ -912,7 +895,7 @@ if __name__ == '__main__':
     ##SES	SCD	CHN	DVC	REP	ENV	NSC	UTN
     ##0	0001	0	Samsung	China	office	quite	116
     map_ses={}
-    load_table_1("%s/session.txt"%(king_table), map_ses, 2);
+    load_table_1("%s/SESSION.TXT"%(king_table), map_ses, 2);
     #out_table_1(map_ses);
     count_rate_1(map_ses, 'DVC')
     count_rate_1(map_ses, 'NSC')
@@ -920,20 +903,22 @@ if __name__ == '__main__':
 
 
 
-    ###  2. 根据各种信息均衡 挑选出50*3个说话人 
-    ##### 每个设备(channel)内选取  50人 
-    ##### 按照一定的标准  选取出NUM_SEL个spk
+    ###  2. 根据各种信息均衡 挑选出 200 个spk 
     vec_res_spk = select_spk_chn(map_spk, map_ses);
 
-    ##### 获取map_spk 中 ['3550', '3330', '3770', '3380'] 个speaker 对应的所有SEX列
-    ##### 统计这些spk的各项信息 比例 
-    #print("\n所有说话人的比例信息");
-    #count_rate_3( get_row_1(map_spk, vec_res_spk, 'SEX') );
-    #count_rate_3( get_row_1(map_spk, vec_res_spk, 'AGE') );
-    #count_rate_3( get_row_1(map_spk, vec_res_spk, 'ACC') );
+    ####  200个spk的 分类的比例  
+    print("\n所有说话人的比例信息");
+    count_rate_3( get_row_1(map_spk, vec_res_spk, 'SEX') );
+    count_rate_3( get_row_1(map_spk, vec_res_spk, 'AGE') );
+    count_rate_3( get_row_1(map_spk, vec_res_spk, 'ACC') );
+    count_rate_3( get_row_1(map_ses, vec_res_spk, 'DVC') );
+    count_rate_3( get_row_1(map_ses, vec_res_spk, 'NSC') );
 
-    ##################################  3. 格式固定的table中   修改具体信息项
-    #format_table();
+    ###  3. 拷贝原始的 wav script table等数据 
+    format_table_1(vec_res_spk);
+
+    ###  3. 格式固定的table中   修改具体信息项
+    format_table_2();
 
 
     ### 重新命名所有wav和相关目录 
@@ -941,7 +926,7 @@ if __name__ == '__main__':
     #    rename_data();
 
     ### 创建script目录 和 重新命名所有script  
-    #create_script();
+    #rename_script();
 
 
     #print("\n\n最终数据库的统计信息:");

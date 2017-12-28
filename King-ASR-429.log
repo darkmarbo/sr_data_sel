@@ -1,0 +1,379 @@
+
+
+statistic: SEX	num:
+F	153
+M	147
+
+
+statistic: AGE	num:
+18	13
+19	22
+20	21
+21	21
+22	16
+23	21
+24	29
+25	1
+26	2
+28	1
+29	2
+30	3
+31	16
+32	25
+33	13
+34	21
+35	17
+36	1
+37	1
+38	2
+39	1
+41	1
+42	1
+44	1
+46	19
+47	11
+48	6
+49	1
+50	1
+52	1
+54	1
+57	3
+59	2
+60	3
+
+
+statistic: ACC	num:
+China, Anhui,	7
+China, Beijing,	76
+China, Chongqing,	1
+China, Gansu,	4
+China, Guangdong,	7
+China, Guangxi,	2
+China, Guizhou,	2
+China, Hainan,	5
+China, Hebei,	51
+China, Heilongjiang,	11
+China, Heilongjinag,	4
+China, Henan,	22
+China, Hubei,	10
+China, Hunan,	8
+China, Inner Mongolia,	8
+China, Jiagsu,	1
+China, Jiangsu,	6
+China, Jiangxi,	6
+China, Jilin,	3
+China, Liaoning,	7
+China, Ningxia,	1
+China, Shaanxi,	5
+China, Shandong,	15
+China, Shanxi,	17
+China, Sichuan,	8
+China, Sinkiang,	4
+China, Tianjin,	5
+China, Zhejiang,	4
+
+
+statistic: DVC	num:
+HTC	65
+Huawei	23
+MIUI	63
+Samsung	149
+
+
+statistic: NSC	num:
+noisy	120
+quite	180
+
+均衡信息记录:
+HTC	noisy	F	0	11: ['0206', '0207', '0202', '0210', '0213', '0193', '0190', '0196', '0197', '0201', '0212']
+HTC	noisy	M	0	9: ['0204', '0205', '0203', '0211', '0192', '0195', '0187', '0189', '0188']
+HTC	quite	F	0	29: ['0135', '0136', '0137', '0132', '0133', '0131', '0143', '0142', '0145', '0144', '0147', '0149', '0059', '0066', '0064', '0062', '0060', '0061', '0068', '0069', '0160', '0071', '0073', '0074', '0077', '0076', '0078', '0150', '0139']
+HTC	quite	M	0	16: ['0134', '0141', '0140', '0146', '0148', '0151', '0067', '0065', '0063', '0070', '0072', '0075', '0079', '0080', '0138', '0152']
+Huawei	quite	F	0	18: ['0035', '0034', '0037', '0036', '0031', '0030', '0033', '0032', '0048', '0049', '0040', '0041', '0042', '0044', '0045', '0052', '0051', '0050']
+Huawei	quite	M	0	5: ['0039', '0038', '0043', '0046', '0047']
+MIUI	noisy	F	0	19: ['0232', '0276', '0279', '0280', '0200', '0274', '0299', '0298', '0291', '0290', '0191', '0194', '0275', '0272', '0270', '0277', '0241', '0273', '0278']
+MIUI	noisy	M	0	18: ['0231', '0288', '0289', '0286', '0287', '0284', '0285', '0282', '0283', '0281', '0292', '0295', '0294', '0297', '0296', '0199', '0186', '0293']
+MIUI	quite	F	0	7: ['0101', '0088', '0085', '0086', '0082', '0098', '0090']
+MIUI	quite	M	0	19: ['0104', '0178', '0179', '0176', '0177', '0180', '0089', '0084', '0087', '0081', '0083', '0157', '0154', '0096', '0095', '0094', '0093', '0092', '0091']
+Samsung	noisy	F	0	30: ['0300', '0234', '0233', '0249', '0229', '0242', '0208', '0265', '0223', '0262', '0226', '0227', '0214', '0217', '0216', '0269', '0258', '0185', '0184', '0181', '0183', '0182', '0243', '0251', '0244', '0239', '0220', '0224', '0218', '0228']
+Samsung	noisy	M	0	33: ['0238', '0235', '0267', '0248', '0261', '0222', '0209', '0230', '0266', '0263', '0260', '0237', '0215', '0268', '0271', '0259', '0010', '0246', '0221', '0236', '0252', '0254', '0255', '0253', '0257', '0256', '0264', '0247', '0245', '0225', '0219', '0250', '0240']
+Samsung	quite	F	0	39: ['0130', '0125', '0124', '0123', '0122', '0112', '0113', '0116', '0117', '0056', '0055', '0108', '0105', '0107', '0106', '0103', '0102', '0119', '0111', '0004', '0005', '0006', '0162', '0009', '0017', '0016', '0015', '0012', '0022', '0020', '0026', '0024', '0028', '0029', '0129', '0128', '0156', '0099', '0097']
+Samsung	quite	M	0	47: ['0127', '0121', '0120', '0058', '0114', '0115', '0053', '0057', '0054', '0158', '0159', '0109', '0100', '0175', '0170', '0171', '0172', '0173', '0174', '0110', '0118', '0007', '0001', '0002', '0003', '0163', '0161', '0008', '0165', '0164', '0014', '0013', '0011', '0126', '0169', '0019', '0018', '0168', '0198', '0023', '0021', '0027', '0025', '0167', '0166', '0155', '0153']
+
+所有说话人的比例信息
+
+rate:
+F	103	51.50
+M	97	48.50
+
+rate:
+18	6	3.00
+19	14	7.00
+20	15	7.50
+21	16	8.00
+22	8	4.00
+23	14	7.00
+24	19	9.50
+28	1	0.50
+29	1	0.50
+30	3	1.50
+31	13	6.50
+32	14	7.00
+33	9	4.50
+34	14	7.00
+35	12	6.00
+36	1	0.50
+38	1	0.50
+39	1	0.50
+41	1	0.50
+42	1	0.50
+44	1	0.50
+46	14	7.00
+47	9	4.50
+48	5	2.50
+49	1	0.50
+52	1	0.50
+57	3	1.50
+60	2	1.00
+
+rate:
+China, Anhui,	5	2.50
+China, Beijing,	53	26.50
+China, Chongqing,	1	0.50
+China, Gansu,	3	1.50
+China, Guangdong,	5	2.50
+China, Guangxi,	2	1.00
+China, Guizhou,	1	0.50
+China, Hainan,	2	1.00
+China, Hebei,	39	19.50
+China, Heilongjiang,	5	2.50
+China, Heilongjinag,	3	1.50
+China, Henan,	14	7.00
+China, Hubei,	8	4.00
+China, Hunan,	6	3.00
+China, Inner Mongolia,	5	2.50
+China, Jiangsu,	1	0.50
+China, Jiangxi,	2	1.00
+China, Jilin,	2	1.00
+China, Liaoning,	4	2.00
+China, Ningxia,	1	0.50
+China, Shaanxi,	5	2.50
+China, Shandong,	11	5.50
+China, Shanxi,	9	4.50
+China, Sichuan,	5	2.50
+China, Sinkiang,	3	1.50
+China, Tianjin,	3	1.50
+China, Zhejiang,	2	1.00
+
+rate:
+HTC	53	26.50
+Huawei	22	11.00
+MIUI	57	28.50
+Samsung	68	34.00
+
+rate:
+noisy	88	44.00
+quite	112	56.00
+
+trans_spk: 最终选取的说话人原始ID的转换:
+dvc_ori	spk_ori	spk_new	:::
+Samsung	0238  --->  SPEAKER0301
+Samsung	0130  --->  SPEAKER0302
+Huawei	0039  --->  SPEAKER0303
+Samsung	0127  --->  SPEAKER0304
+MIUI	0101  --->  SPEAKER0305
+HTC	0134  --->  SPEAKER0306
+Samsung	0300  --->  SPEAKER0307
+MIUI	0232  --->  SPEAKER0308
+MIUI	0231  --->  SPEAKER0309
+Huawei	0035  --->  SPEAKER0310
+HTC	0204  --->  SPEAKER0311
+HTC	0206  --->  SPEAKER0312
+HTC	0135  --->  SPEAKER0313
+MIUI	0104  --->  SPEAKER0314
+Samsung	0235  --->  SPEAKER0315
+Samsung	0125  --->  SPEAKER0316
+Huawei	0038  --->  SPEAKER0317
+Samsung	0121  --->  SPEAKER0318
+MIUI	0088  --->  SPEAKER0319
+HTC	0141  --->  SPEAKER0320
+Samsung	0234  --->  SPEAKER0321
+MIUI	0276  --->  SPEAKER0322
+MIUI	0288  --->  SPEAKER0323
+Huawei	0034  --->  SPEAKER0324
+HTC	0205  --->  SPEAKER0325
+HTC	0207  --->  SPEAKER0326
+HTC	0136  --->  SPEAKER0327
+MIUI	0178  --->  SPEAKER0328
+Samsung	0267  --->  SPEAKER0329
+Samsung	0124  --->  SPEAKER0330
+Huawei	0043  --->  SPEAKER0331
+Samsung	0120  --->  SPEAKER0332
+MIUI	0085  --->  SPEAKER0333
+HTC	0140  --->  SPEAKER0334
+Samsung	0233  --->  SPEAKER0335
+MIUI	0279  --->  SPEAKER0336
+MIUI	0289  --->  SPEAKER0337
+Huawei	0037  --->  SPEAKER0338
+HTC	0203  --->  SPEAKER0339
+HTC	0202  --->  SPEAKER0340
+HTC	0137  --->  SPEAKER0341
+MIUI	0179  --->  SPEAKER0342
+Samsung	0248  --->  SPEAKER0343
+Samsung	0123  --->  SPEAKER0344
+Huawei	0046  --->  SPEAKER0345
+Samsung	0058  --->  SPEAKER0346
+MIUI	0086  --->  SPEAKER0347
+HTC	0146  --->  SPEAKER0348
+Samsung	0249  --->  SPEAKER0349
+MIUI	0280  --->  SPEAKER0350
+MIUI	0286  --->  SPEAKER0351
+Huawei	0036  --->  SPEAKER0352
+HTC	0211  --->  SPEAKER0353
+HTC	0210  --->  SPEAKER0354
+HTC	0132  --->  SPEAKER0355
+MIUI	0176  --->  SPEAKER0356
+Samsung	0261  --->  SPEAKER0357
+Samsung	0122  --->  SPEAKER0358
+Huawei	0047  --->  SPEAKER0359
+Samsung	0114  --->  SPEAKER0360
+MIUI	0082  --->  SPEAKER0361
+HTC	0148  --->  SPEAKER0362
+Samsung	0229  --->  SPEAKER0363
+MIUI	0200  --->  SPEAKER0364
+MIUI	0287  --->  SPEAKER0365
+Huawei	0031  --->  SPEAKER0366
+HTC	0192  --->  SPEAKER0367
+HTC	0213  --->  SPEAKER0368
+HTC	0133  --->  SPEAKER0369
+MIUI	0177  --->  SPEAKER0370
+Samsung	0222  --->  SPEAKER0371
+Samsung	0112  --->  SPEAKER0372
+Samsung	0115  --->  SPEAKER0373
+MIUI	0098  --->  SPEAKER0374
+HTC	0151  --->  SPEAKER0375
+Samsung	0242  --->  SPEAKER0376
+MIUI	0274  --->  SPEAKER0377
+MIUI	0284  --->  SPEAKER0378
+Huawei	0030  --->  SPEAKER0379
+HTC	0195  --->  SPEAKER0380
+HTC	0193  --->  SPEAKER0381
+HTC	0131  --->  SPEAKER0382
+MIUI	0180  --->  SPEAKER0383
+Samsung	0209  --->  SPEAKER0384
+Samsung	0113  --->  SPEAKER0385
+Samsung	0053  --->  SPEAKER0386
+MIUI	0090  --->  SPEAKER0387
+HTC	0067  --->  SPEAKER0388
+Samsung	0208  --->  SPEAKER0389
+MIUI	0299  --->  SPEAKER0390
+MIUI	0285  --->  SPEAKER0391
+Huawei	0033  --->  SPEAKER0392
+HTC	0187  --->  SPEAKER0393
+HTC	0190  --->  SPEAKER0394
+HTC	0143  --->  SPEAKER0395
+MIUI	0089  --->  SPEAKER0396
+Samsung	0230  --->  SPEAKER0397
+Samsung	0116  --->  SPEAKER0398
+Samsung	0057  --->  SPEAKER0399
+HTC	0065  --->  SPEAKER0400
+Samsung	0265  --->  SPEAKER0401
+MIUI	0298  --->  SPEAKER0402
+MIUI	0282  --->  SPEAKER0403
+Huawei	0032  --->  SPEAKER0404
+HTC	0189  --->  SPEAKER0405
+HTC	0196  --->  SPEAKER0406
+HTC	0142  --->  SPEAKER0407
+MIUI	0084  --->  SPEAKER0408
+Samsung	0266  --->  SPEAKER0409
+Samsung	0117  --->  SPEAKER0410
+Samsung	0054  --->  SPEAKER0411
+HTC	0063  --->  SPEAKER0412
+Samsung	0223  --->  SPEAKER0413
+MIUI	0291  --->  SPEAKER0414
+MIUI	0283  --->  SPEAKER0415
+Huawei	0048  --->  SPEAKER0416
+HTC	0188  --->  SPEAKER0417
+HTC	0197  --->  SPEAKER0418
+HTC	0145  --->  SPEAKER0419
+MIUI	0087  --->  SPEAKER0420
+Samsung	0263  --->  SPEAKER0421
+Samsung	0056  --->  SPEAKER0422
+Samsung	0158  --->  SPEAKER0423
+HTC	0070  --->  SPEAKER0424
+Samsung	0262  --->  SPEAKER0425
+MIUI	0290  --->  SPEAKER0426
+MIUI	0281  --->  SPEAKER0427
+Huawei	0049  --->  SPEAKER0428
+HTC	0201  --->  SPEAKER0429
+HTC	0144  --->  SPEAKER0430
+MIUI	0081  --->  SPEAKER0431
+Samsung	0260  --->  SPEAKER0432
+Samsung	0055  --->  SPEAKER0433
+Samsung	0159  --->  SPEAKER0434
+HTC	0072  --->  SPEAKER0435
+Samsung	0226  --->  SPEAKER0436
+MIUI	0191  --->  SPEAKER0437
+MIUI	0292  --->  SPEAKER0438
+Huawei	0040  --->  SPEAKER0439
+HTC	0212  --->  SPEAKER0440
+HTC	0147  --->  SPEAKER0441
+MIUI	0083  --->  SPEAKER0442
+Samsung	0237  --->  SPEAKER0443
+Samsung	0108  --->  SPEAKER0444
+Samsung	0109  --->  SPEAKER0445
+HTC	0075  --->  SPEAKER0446
+Samsung	0227  --->  SPEAKER0447
+MIUI	0194  --->  SPEAKER0448
+MIUI	0295  --->  SPEAKER0449
+Huawei	0041  --->  SPEAKER0450
+HTC	0149  --->  SPEAKER0451
+MIUI	0157  --->  SPEAKER0452
+Samsung	0215  --->  SPEAKER0453
+Samsung	0105  --->  SPEAKER0454
+Samsung	0100  --->  SPEAKER0455
+HTC	0079  --->  SPEAKER0456
+Samsung	0214  --->  SPEAKER0457
+MIUI	0275  --->  SPEAKER0458
+MIUI	0294  --->  SPEAKER0459
+Huawei	0042  --->  SPEAKER0460
+HTC	0059  --->  SPEAKER0461
+MIUI	0154  --->  SPEAKER0462
+Samsung	0268  --->  SPEAKER0463
+Samsung	0107  --->  SPEAKER0464
+Samsung	0175  --->  SPEAKER0465
+HTC	0080  --->  SPEAKER0466
+Samsung	0217  --->  SPEAKER0467
+MIUI	0272  --->  SPEAKER0468
+MIUI	0297  --->  SPEAKER0469
+Huawei	0044  --->  SPEAKER0470
+HTC	0066  --->  SPEAKER0471
+MIUI	0096  --->  SPEAKER0472
+Samsung	0271  --->  SPEAKER0473
+Samsung	0106  --->  SPEAKER0474
+Samsung	0170  --->  SPEAKER0475
+HTC	0138  --->  SPEAKER0476
+Samsung	0216  --->  SPEAKER0477
+MIUI	0270  --->  SPEAKER0478
+MIUI	0296  --->  SPEAKER0479
+Huawei	0045  --->  SPEAKER0480
+HTC	0064  --->  SPEAKER0481
+MIUI	0095  --->  SPEAKER0482
+Samsung	0259  --->  SPEAKER0483
+Samsung	0103  --->  SPEAKER0484
+Samsung	0171  --->  SPEAKER0485
+HTC	0152  --->  SPEAKER0486
+Samsung	0269  --->  SPEAKER0487
+MIUI	0277  --->  SPEAKER0488
+MIUI	0199  --->  SPEAKER0489
+Huawei	0052  --->  SPEAKER0490
+HTC	0062  --->  SPEAKER0491
+MIUI	0094  --->  SPEAKER0492
+Samsung	0010  --->  SPEAKER0493
+Samsung	0102  --->  SPEAKER0494
+Samsung	0172  --->  SPEAKER0495
+Samsung	0258  --->  SPEAKER0496
+MIUI	0241  --->  SPEAKER0497
+MIUI	0186  --->  SPEAKER0498
+Huawei	0051  --->  SPEAKER0499
+HTC	0060  --->  SPEAKER0500

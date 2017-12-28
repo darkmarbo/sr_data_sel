@@ -1,14 +1,10 @@
 #!/bin/sh
 
-### king_asr_429:
-dos2unix king_429_test/TABLE/*
-rm -rf king_429_test_ou*
-python2.7 rrr_429.py  > king_429_test.log 
 
 
 
-
-####  King_ASR_358: 
+#####  King_ASR_358: 
+##### DEVICE01-03  SESSION01-02
 #rm -rf King-ASR-358_ou*
 #python2.7 read_table.py  > King-ASR-358.log 
 #
@@ -23,7 +19,15 @@ python2.7 rrr_429.py  > king_429_test.log
 #    sed -i 's/<[A-Z]\+\/>//g' $file
 #done
 
-### 统一命名规则 
+
+
+
+### king_asr_429:
+#### DEVICE04-07  SESSION03-04
+king=King-ASR-429
+dos2unix ${king}/TABLE/*
+rm -rf ${king}_ou*
+python2.7 rrr_429.py  > ${king}.log 
 
 
 
