@@ -479,7 +479,7 @@ def format_table_1(vec_spk_chn):
             #### 1. wave ABBBBCDDD.wav 
             ## King-ASR-429/DATA/CHANNEL0/WAVE/SPEAKER0001/SESSION0/000010001.WAV
             dir_wav="%s/DATA/CHANNEL%s/WAVE/SPEAKER%s"%(king, CHN,spk)
-            print("test:path_dir_wav=%s"%(dir_wav));
+            #print("test:path_dir_wav=%s"%(dir_wav));
             if not os.path.isdir(dir_wav):
                 print("error:path=%s not exist!"%(dir_wav));
                 sys.exit(0);

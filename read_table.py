@@ -441,7 +441,7 @@ def select_spk_chn(map_spk, map_ses):
                 #### 1. wave 
                 #### DATA/CHANNEL0/WAVE/SPEAKER0830 里面是 SESSION0
                 dir_wav="%s/DATA/CHANNEL%s/WAVE/SPEAKER%s"%(king, CHN,spk)
-                print("test:path_dir_wav=%s"%(dir_wav));
+                ##print("test:path_dir_wav=%s"%(dir_wav));
                 if not os.path.isdir(dir_wav):
                     print("error:path=%s not exist!"%(dir_wav));
                     sys.exit(0);
