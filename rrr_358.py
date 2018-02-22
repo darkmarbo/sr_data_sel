@@ -13,9 +13,9 @@ flag_wav=1
 king="King-ASR-358"
 king_table="King-ASR-358/TABLE"
 king_data="King-ASR-358/DATA"
-king_out="King-ASR-358_out2"
-king_out_table="King-ASR-358_out2/TABLE"
-king_out_data="King-ASR-358_out2/DATA"
+king_out="King-ASR-358_out"
+king_out_table="King-ASR-358_out/TABLE"
+king_out_data="King-ASR-358_out/DATA"
 
 list_dvc_ori=('CHANNEL0', 'CHANNEL1', 'CHANNEL2'); 
 
@@ -834,12 +834,12 @@ def rename_data():
 
         dvc_new = trans_dvc[dvc_ori];
 
-        ## King-ASR-358_out2/DATA/DEVICE02
+        ## King-ASR-358_out/DATA/DEVICE02
         path_dvc_ori = "%s/%s"%(king_out_data, dvc_ori);
         path_dvc_new = "%s/%s"%(king_out_data, dvc_new);
 
 
-        ## King-ASR-358_out2/DATA/DEVICE02/WAVE
+        ## King-ASR-358_out/DATA/DEVICE02/WAVE
         ## 不同的 speaker 进入到不同的 session 中 
         path_WAVE="%s/WAVE"%(path_dvc_ori)
         list_spk=os.listdir(path_WAVE);
@@ -869,14 +869,14 @@ def rename_data():
 
 
 ## 处理所有wav对应的script  
-## King-ASR-358_out2/DATA/CHANNEL1/SCRIPT/100500.TXT
+## King-ASR-358_out/DATA/CHANNEL1/SCRIPT/100500.TXT
 def create_script():
     ## ['CHANNEL0', 'CHANNEL1', 'CHANNEL2'] 
     for dvc_ori in list_dvc_ori:
 
         dvc_new = trans_dvc[dvc_ori];
 
-        ## King-ASR-358_out2/DATA/DEVICE02/SCRIPT
+        ## King-ASR-358_out/DATA/DEVICE02/SCRIPT
         path_scp_ori = "%s/%s/SCRIPT"%(king_out_data, dvc_ori);
         path_scp_new = "%s/%s/SCRIPT"%(king_out_data, dvc_new);
         os.makedirs(path_scp_new);
@@ -908,7 +908,7 @@ def create_script():
             fp_out.close();
 
         ## 删除其他无用数据 
-        ## King-ASR-358_out2/DATA/CHANNEL
+        ## King-ASR-358_out/DATA/CHANNEL
         dir_rm="%s/%s"%(king_out_data, dvc_ori)
         shutil.rmtree(dir_rm);
 
